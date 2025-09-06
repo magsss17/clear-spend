@@ -101,12 +101,21 @@ enum PurchaseJustification: String, Codable, CaseIterable {
 // MARK: - Verification System
 
 struct VerificationProof: Identifiable, Codable {
-    let id = UUID()
+    let id: UUID
     let type: VerificationType
     let result: VerificationResult
     let details: String
     let timestamp: Date
     let blockchainHash: String?
+    
+    init(type: VerificationType, result: VerificationResult, details: String, timestamp: Date, blockchainHash: String?) {
+        self.id = UUID()
+        self.type = type
+        self.result = result
+        self.details = details
+        self.timestamp = timestamp
+        self.blockchainHash = blockchainHash
+    }
     
     enum VerificationType: String, Codable {
         case merchantReputation = "Merchant Reputation"
@@ -148,7 +157,7 @@ struct VerificationProof: Identifiable, Codable {
 // MARK: - Enhanced Merchant System
 
 struct ApprovedMerchant: Identifiable {
-    let id = UUID()
+    let id: UUID
     let name: String
     let category: String
     let icon: String
@@ -161,6 +170,22 @@ struct ApprovedMerchant: Identifiable {
     let dailyLimit: Double
     let monthlyTransactions: Int
     let fraudReports: Int
+    
+    init(name: String, category: String, icon: String, isVerified: Bool, reputationScore: Double, businessLicenseVerified: Bool, communityRating: Double, trustLevel: TrustLevel, verificationDate: Date, dailyLimit: Double, monthlyTransactions: Int, fraudReports: Int) {
+        self.id = UUID()
+        self.name = name
+        self.category = category
+        self.icon = icon
+        self.isVerified = isVerified
+        self.reputationScore = reputationScore
+        self.businessLicenseVerified = businessLicenseVerified
+        self.communityRating = communityRating
+        self.trustLevel = trustLevel
+        self.verificationDate = verificationDate
+        self.dailyLimit = dailyLimit
+        self.monthlyTransactions = monthlyTransactions
+        self.fraudReports = fraudReports
+    }
     
     enum TrustLevel: String, CaseIterable {
         case excellent = "Excellent"

@@ -8,6 +8,7 @@ struct TransactionRowView: View {
         case .approved: return .green
         case .rejected: return .red
         case .pending: return .orange
+        case .requiresParentApproval: return .blue
         }
     }
     

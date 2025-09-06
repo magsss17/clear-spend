@@ -33,7 +33,7 @@ class AlgorandService: ObservableObject {
     // Main branch compatibility method
     func refreshBalance() async {
         // Simulate balance refresh
-        await Task.sleep(nanoseconds: 1_000_000_000) // 1 second delay
+        try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 second delay
         // In a real implementation, this would fetch from blockchain
         asaBalance = 150.0
         balance = 150.0
