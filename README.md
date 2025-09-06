@@ -71,50 +71,111 @@ ClearSpend leverages Algorand's atomic transfers and smart contracts to create a
 
 ```
 clear-spend/
-├── ClearSpend/           # iOS app
-│   ├── Views/           # SwiftUI views
-│   ├── Models/          # Data models
-│   ├── Services/        # Algorand integration
-│   └── ViewModels/      # Business logic
-├── contracts/           # Smart contracts
-│   ├── attestation_oracle.py
-│   └── allowance_manager.py
-└── Package.swift        # SPM configuration
+├── backend/                    # Backend API & Services
+│   ├── contracts/             # AlgoKit smart contracts
+│   │   ├── attestation_oracle.py
+│   │   └── allowance_manager.py
+│   ├── services/              # Core business logic
+│   │   ├── blockchain_service.py
+│   │   └── oracle_service.py
+│   ├── api/                   # FastAPI endpoints
+│   │   ├── routes/            # API routes
+│   │   └── models/            # Request/Response models
+│   ├── tests/                 # Comprehensive testing
+│   ├── deployment/            # Docker & deployment configs
+│   └── main.py                # FastAPI application
+├── ios-app/                   # iOS SwiftUI app
+│   └── ClearSpendApp/         # Xcode project
+│       ├── Views/             # SwiftUI views
+│       ├── Models/            # Data models
+│       ├── Services/          # Algorand integration
+│       ├── ViewModels/        # Business logic
+│       └── Resources/         # Assets and resources
+├── docs/                      # Documentation
+│   ├── ARCHITECTURE.md        # System architecture
+│   ├── API.md                 # API documentation
+│   └── config.env.example     # Environment template
+├── scripts/                   # Utility scripts
+│   ├── setup.sh              # Project setup script
+│   └── start_backend.py      # Backend startup script
+├── tools/                     # Development tools
+├── Makefile                   # Build automation
+├── .gitignore                 # Git ignore rules
+└── requirements.txt           # Python dependencies
 ```
 
 ## 🚦 Getting Started
 
 ### Prerequisites
+- Python 3.11+
 - Xcode 15+
 - iOS 17+
 - Algorand Testnet account
+- AlgoKit installed (`pipx install algokit`)
 
-### Installation
+### Quick Setup
 ```bash
 # Clone repository
 git clone https://github.com/yourteam/clearspend.git
+cd clear-spend
 
-# Open in Xcode
-open ClearSpend/ClearSpend.xcodeproj
+# Run automated setup
+./scripts/setup.sh
 
-# Build and run on simulator
+# Start the backend
+make backend
 ```
 
-### Smart Contract Deployment
+### Manual Setup
 ```bash
-# Install AlgoKit
-pipx install algokit
+# Install dependencies
+make install
 
-# Deploy contracts
-algokit compile contracts/attestation_oracle.py
-algokit deploy
+# Configure environment
+cp docs/config.env.example docs/config.env
+# Edit docs/config.env with your Algorand credentials
+
+# Deploy smart contracts
+make deploy
+
+# Start the backend API
+make backend
+```
+
+### iOS App Setup
+```bash
+# Open in Xcode
+open ios-app/ClearSpendApp.xcodeproj
+
+# Build and run on simulator
+make ios
+```
+
+### Available Commands
+```bash
+make help          # Show all available commands
+make install       # Install dependencies
+make backend       # Start backend API
+make ios          # Build iOS app
+make test         # Run all tests
+make deploy       # Deploy smart contracts
+make docker       # Run with Docker Compose
+make clean        # Clean temporary files
 ```
 
 ## 🎮 Demo Flow
 
+### Backend API Flow
+1. **Start Backend** → API running on `http://localhost:8000`
+2. **Deploy Contracts** → Smart contracts deployed to Algorand Testnet
+3. **Add Merchants** → Oracle service manages merchant attestations
+4. **Verify Purchases** → Real-time purchase verification via API
+5. **Execute Transactions** → Atomic transfer groups for secure purchases
+
+### iOS App Flow
 1. **Teen opens app** → Sees 150 ALGO allowance
 2. **Initiates purchase** → Selects merchant and amount
-3. **Atomic verification** → Smart contract checks attestation
+3. **API Verification** → Backend verifies purchase via atomic transfers
 4. **Approved purchases** → Instant confirmation with explorer link
 5. **Rejected purchases** → Clear feedback on restrictions
 6. **Learning rewards** → Earn XP for financial education

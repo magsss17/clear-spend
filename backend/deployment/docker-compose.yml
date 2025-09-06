@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  clearspend-backend:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - ALGOD_TOKEN=${ALGOD_TOKEN}
+      - ALGOD_ADDRESS=${ALGOD_ADDRESS}
+      - INDEXER_ADDRESS=${INDEXER_ADDRESS}
+      - DEMO_PARENT_MNEMONIC=${DEMO_PARENT_MNEMONIC}
+      - DEMO_TEEN_MNEMONIC=${DEMO_TEEN_MNEMONIC}
+      - DEMO_ORACLE_MNEMONIC=${DEMO_ORACLE_MNEMONIC}
+      - ORACLE_PRIVATE_KEY=${ORACLE_PRIVATE_KEY}
+      - HOST=0.0.0.0
+      - PORT=8000
+      - DEBUG=false
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=clearspend
+      - POSTGRES_USER=clearspend
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+  postgres_data:
