@@ -89,6 +89,36 @@ class OracleService:
                 "last_update": int(datetime.now().timestamp()),
                 "parent_approved": True,
                 "merchant_address": "DEMO_BOOKSTORE_ADDRESS"
+            },
+            "Amazon": {
+                "merchant_name": "Amazon",
+                "category": "Shopping",
+                "is_approved": True,
+                "daily_limit": 200000000,  # 200 ALGO
+                "total_spent_today": 0,
+                "last_update": int(datetime.now().timestamp()),
+                "parent_approved": True,
+                "merchant_address": "DEMO_AMAZON_ADDRESS"
+            },
+            "Khan Academy": {
+                "merchant_name": "Khan Academy",
+                "category": "Education",
+                "is_approved": True,
+                "daily_limit": 100000000,  # 100 ALGO
+                "total_spent_today": 0,
+                "last_update": int(datetime.now().timestamp()),
+                "parent_approved": True,
+                "merchant_address": "DEMO_KHAN_ADDRESS"
+            },
+            "Spotify": {
+                "merchant_name": "Spotify",
+                "category": "Entertainment",
+                "is_approved": True,
+                "daily_limit": 50000000,  # 50 ALGO
+                "total_spent_today": 0,
+                "last_update": int(datetime.now().timestamp()),
+                "parent_approved": True,
+                "merchant_address": "DEMO_SPOTIFY_ADDRESS"
             }
         }
         
