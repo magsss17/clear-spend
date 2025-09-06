@@ -317,7 +317,7 @@ struct ParentControlView: View {
         
         // Mock the allowance transfer for demo
         await MainActor.run {
-            walletViewModel.asaBalance += Double(allowanceAmount) ?? 50.0
+            walletViewModel.balance += Double(allowanceAmount) ?? 50.0
         }
     }
     

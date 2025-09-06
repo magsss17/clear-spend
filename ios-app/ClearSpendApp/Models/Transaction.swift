@@ -56,20 +56,3 @@ struct ApprovedMerchant: Identifiable {
         ApprovedMerchant(name: "Steam", category: "Gaming", icon: "gamecontroller.fill", isVerified: true)
     ]
 }
-
-struct LearningModule: Identifiable {
-    let id = UUID()
-    let title: String
-    let lessons: Int
-    let duration: String
-    let progress: Double
-    let icon: String
-    
-    static let examples = [
-        LearningModule(title: "Budgeting Basics", lessons: 5, duration: "30 min", progress: 0.8, icon: "chart.pie.fill"),
-        LearningModule(title: "Smart Saving", lessons: 7, duration: "45 min", progress: 0.6, icon: "banknote"),
-        LearningModule(title: "Intro to Investing", lessons: 10, duration: "1 hour", progress: 0.3, icon: "chart.line.uptrend.xyaxis"),
-        LearningModule(title: "Understanding Credit", lessons: 6, duration: "40 min", progress: 0.0, icon: "creditcard.fill"),
-        LearningModule(title: "Crypto 101", lessons: 8, duration: "50 min", progress: 1.0, icon: "bitcoinsign.circle.fill")
-    ]
-}
