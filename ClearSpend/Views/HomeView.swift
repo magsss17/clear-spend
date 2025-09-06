@@ -13,9 +13,9 @@ struct HomeView: View {
                     
                     creditScoreSection
                     
-                    spendingIntegritySection
+                    // spendingIntegritySection
                     
-                    fraudPreventionSection
+                    // fraudPreventionSection
                     
                     recentTransactionsSection
                     
@@ -45,45 +45,21 @@ struct HomeView: View {
     }
     
     private var balanceCard: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Your Credit Line")
-                .font(.headline)
-                .foregroundColor(.secondary)
+        VStack(spacing: 8) {
+            Text("Your Balance")
+                .font(.caption)
+                .foregroundColor(.gray)
             
-            HStack(alignment: .bottom, spacing: 8) {
-                Text("\(walletViewModel.formattedBalance)")
-                    .font(.system(size: 42, weight: .bold, design: .rounded))
-                
-                Text("ALGO")
-                    .font(.title3)
-                    .foregroundColor(.secondary)
-                    .padding(.bottom, 6)
-            }
-            
-            HStack {
-                Text("Network Balance: \(walletViewModel.formattedAlgoBalance) ALGO")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                Spacer()
-            }
-            
-            HStack {
-                Label("Weekly Allowance", systemImage: "calendar")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                
-                Spacer()
-                
-                Text("+50 ALGO (earned through education)")
-                    .font(.caption)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.green)
-            }
+            Text("\(walletViewModel.formattedBalance) ALGO")
+                .font(.title)
+                .fontWeight(.bold)
+                .foregroundColor(.purple)
         }
+        .frame(maxWidth: .infinity)
         .padding()
         .background(Color.white)
-        .cornerRadius(16)
-        .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
+        .cornerRadius(12)
+        .shadow(color: .black.opacity(0.05), radius: 6, x: 0, y: 2)
     }
     
     private var recentTransactionsSection: some View {
@@ -110,7 +86,7 @@ struct HomeView: View {
                             .foregroundColor(.gray)
                         Text("No recent transactions")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.gray)
                     }
                     .padding(.vertical, 20)
                     Spacer()
@@ -158,7 +134,7 @@ struct HomeView: View {
     private var creditScoreSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
-                Text("Credit Building Score")
+                Text("Your Balance")
                     .font(.headline)
                 
                 Spacer()
@@ -186,11 +162,12 @@ struct HomeView: View {
                     
                     Text("Built from 23 verified purchases")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.gray)
                 }
                 
                 Spacer()
                 
+                /*
                 VStack(alignment: .trailing, spacing: 4) {
                     Image(systemName: "shield.checkered.fill")
                         .font(.system(size: 40))
@@ -199,21 +176,22 @@ struct HomeView: View {
                     Text("Blockchain\nVerified")
                         .font(.caption)
                         .multilineTextAlignment(.trailing)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.gray)
                 }
+                */
             }
             
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Text("Next milestone")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.gray)
                     
                     Spacer()
                     
                     Text("750+ score")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.gray)
                 }
                 
                 ProgressView(value: 742, total: 750)
@@ -253,7 +231,7 @@ struct HomeView: View {
                     
                     Text("Based on \(walletViewModel.totalVerifiedPurchases) verified purchases")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.gray)
                 }
                 
                 Spacer()
@@ -266,7 +244,7 @@ struct HomeView: View {
                     Text("Provably\nGood")
                         .font(.caption)
                         .multilineTextAlignment(.trailing)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.gray)
                 }
             }
             
@@ -282,7 +260,7 @@ struct HomeView: View {
                             .fontWeight(.medium)
                         Text("\(walletViewModel.goodSpendingStreak) consecutive verified purchases")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.gray)
                     }
                     
                     Spacer()
@@ -304,7 +282,7 @@ struct HomeView: View {
                             .fontWeight(.medium)
                         Text("Good spending increases credit score faster")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.gray)
                     }
                     
                     Spacer()
@@ -323,7 +301,7 @@ struct HomeView: View {
                     Text("Recent Integrity Factors")
                         .font(.caption)
                         .fontWeight(.medium)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.gray)
                     
                     HStack(spacing: 8) {
                         integrityFactorChip("Education", score: "+50%", color: .blue)
@@ -353,7 +331,7 @@ struct HomeView: View {
                 .foregroundColor(color)
             Text(title)
                 .font(.caption2)
-                .foregroundColor(.secondary)
+                .foregroundColor(.gray)
         }
         .padding(.horizontal, 6)
         .padding(.vertical, 4)
@@ -388,7 +366,7 @@ struct HomeView: View {
                             .fontWeight(.medium)
                         Text("Every transaction verified before payment")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.gray)
                     }
                     
                     Spacer()
@@ -408,7 +386,7 @@ struct HomeView: View {
                             .fontWeight(.medium)
                         Text("Saved $127 in potential fraud losses")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.gray)
                     }
                     
                     Spacer()
@@ -430,7 +408,7 @@ struct HomeView: View {
                             .fontWeight(.medium)
                         Text("Safe for teen spending")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.gray)
                     }
                     
                     Spacer()

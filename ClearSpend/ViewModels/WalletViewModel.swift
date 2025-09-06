@@ -104,6 +104,10 @@ class WalletViewModel: ObservableObject {
         isLoading = false
     }
     
+    func subtractFromBalance(_ amount: Double) {
+        asaBalance = max(0, asaBalance - amount)
+    }
+    
     func loadTransactionHistory() async {
         isLoading = true
         

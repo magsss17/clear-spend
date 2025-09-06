@@ -43,7 +43,7 @@ struct ContentView: View {
             let tabAppearance = UITabBarAppearance()
             tabAppearance.configureWithOpaqueBackground()
             tabAppearance.backgroundColor = UIColor.white
-            tabAppearance.shadowColor = UIColor.black.withAlphaComponent(0.1)
+            tabAppearance.shadowColor = UIColor.black.withAlphaComponent(0.3)
             
             UITabBar.appearance().standardAppearance = tabAppearance
             UITabBar.appearance().scrollEdgeAppearance = tabAppearance
@@ -52,7 +52,7 @@ struct ContentView: View {
             let navAppearance = UINavigationBarAppearance()
             navAppearance.configureWithOpaqueBackground()
             navAppearance.backgroundColor = UIColor.white
-            navAppearance.shadowColor = UIColor.black.withAlphaComponent(0.1)
+            navAppearance.shadowColor = UIColor.black.withAlphaComponent(0.3)
             navAppearance.titleTextAttributes = [.foregroundColor: UIColor.black]
             navAppearance.largeTitleTextAttributes = [.foregroundColor: UIColor.black]
             
@@ -62,7 +62,7 @@ struct ContentView: View {
             
             // Configure list appearance for white theme
             UITableView.appearance().backgroundColor = UIColor.white
-            UITableView.appearance().separatorColor = UIColor.gray.withAlphaComponent(0.2)
+            UITableView.appearance().separatorColor = UIColor.gray.withAlphaComponent(0.5)
         }
     }
 }

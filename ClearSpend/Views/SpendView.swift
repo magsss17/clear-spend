@@ -28,7 +28,7 @@ struct SpendView: View {
                     
                     categorySelector
                     
-                    purchaseJustificationSelector
+                    // purchaseJustificationSelector
                     
                     purchaseButton
                     
@@ -49,21 +49,25 @@ struct SpendView: View {
     }
     
     private var availableBalanceCard: some View {
-        VStack(spacing: 8) {
+        VStack(alignment: .leading, spacing: 16) {
             Text("Available to Spend")
-                .font(.caption)
-                .foregroundColor(.secondary)
+                .font(.headline)
+                .foregroundColor(.gray)
             
-            Text("\(walletViewModel.formattedBalance) ALGO")
-                .font(.title)
-                .fontWeight(.bold)
-                .foregroundColor(.purple)
+            HStack(alignment: .bottom, spacing: 8) {
+                Text("\(walletViewModel.formattedBalance)")
+                    .font(.system(size: 42, weight: .bold, design: .rounded))
+                
+                Text("ALGO")
+                    .font(.title3)
+                    .foregroundColor(.gray)
+                    .padding(.bottom, 6)
+            }
         }
-        .frame(maxWidth: .infinity)
         .padding()
         .background(Color.white)
-        .cornerRadius(12)
-        .shadow(color: .black.opacity(0.05), radius: 6, x: 0, y: 2)
+        .cornerRadius(16)
+        .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
     }
     
     private var purchaseForm: some View {
@@ -74,7 +78,7 @@ struct SpendView: View {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Merchant")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.gray)
                 
                 TextField("Enter merchant name", text: $merchantName)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -83,7 +87,7 @@ struct SpendView: View {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Amount (ALGO)")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.gray)
                 
                 TextField("0.00", text: $amount)
                     .keyboardType(.decimalPad)
@@ -144,7 +148,7 @@ struct SpendView: View {
                             .fontWeight(.medium)
                         Text(purchaseJustification.description)
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.gray)
                     }
                     
                     Spacer()
@@ -159,7 +163,7 @@ struct SpendView: View {
                         .cornerRadius(8)
                 }
                 .padding()
-                .background(Color.blue.opacity(0.05))
+                .background(Color.blue.opacity(0.15))
                 .cornerRadius(12)
                 .onTapGesture {
                     // Show justification picker
@@ -227,7 +231,7 @@ struct SpendView: View {
                 Spacer()
                 Text("Reputation Score")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.gray)
             }
             
             ForEach(ApprovedMerchant.examples, id: \.id) { merchant in
@@ -254,14 +258,14 @@ struct SpendView: View {
                         HStack {
                             Text(merchant.category)
                                 .font(.caption)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(.gray)
                             
                             Text("•")
-                                .foregroundColor(.secondary)
+                                .foregroundColor(.gray)
                             
                             Text("\(merchant.monthlyTransactions) transactions")
                                 .font(.caption)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(.gray)
                         }
                         
                         HStack {
@@ -300,7 +304,7 @@ struct SpendView: View {
                     }
                 }
                 .padding()
-                .background(Color.gray.opacity(0.05))
+                .background(Color.gray.opacity(0.15))
                 .cornerRadius(12)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
@@ -389,10 +393,10 @@ struct SpendView: View {
             
             Text("Every purchase verified via atomic transfers before payment")
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundColor(.gray)
         }
         .padding()
-        .background(Color.blue.opacity(0.05))
+        .background(Color.blue.opacity(0.15))
         .cornerRadius(12)
     }
     
@@ -457,7 +461,7 @@ struct SpendView: View {
                     .fontWeight(.medium)
                 Text(reason)
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.gray)
             }
             
             Spacer()
@@ -532,7 +536,7 @@ struct PurchaseJustificationInfoView: View {
                         
                         Text("To build trust and credit worthiness, ClearSpend requires teens to justify their spending decisions. This helps:")
                             .font(.subheadline)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.gray)
                     }
                     
                     VStack(spacing: 16) {
@@ -577,7 +581,7 @@ struct PurchaseJustificationInfoView: View {
                                         .fontWeight(.medium)
                                     Text(justification.description)
                                         .font(.caption)
-                                        .foregroundColor(.secondary)
+                                        .foregroundColor(.gray)
                                 }
                                 
                                 Spacer()
@@ -588,7 +592,7 @@ struct PurchaseJustificationInfoView: View {
                                     .foregroundColor(.green)
                             }
                             .padding()
-                            .background(Color.gray.opacity(0.05))
+                            .background(Color.gray.opacity(0.15))
                             .cornerRadius(8)
                         }
                     }
@@ -619,11 +623,11 @@ struct PurchaseJustificationInfoView: View {
                     .fontWeight(.semibold)
                 Text(description)
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.gray)
             }
         }
         .padding()
-        .background(Color.blue.opacity(0.05))
+        .background(Color.blue.opacity(0.15))
         .cornerRadius(10)
     }
 }

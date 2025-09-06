@@ -47,7 +47,7 @@ struct ParentControlView: View {
                 VStack(alignment: .leading) {
                     Text("Teen's Allowance")
                         .font(.headline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.gray)
                     
                     Text("\(walletViewModel.formattedBalance) ALGO")
                         .font(.system(size: 28, weight: .bold, design: .rounded))
@@ -58,7 +58,7 @@ struct ParentControlView: View {
                 VStack(alignment: .trailing) {
                     Text("Weekly Budget")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.gray)
                     
                     Text("$\(allowanceAmount)")
                         .font(.title3)
@@ -71,7 +71,7 @@ struct ParentControlView: View {
             HStack {
                 Label("Testnet Address", systemImage: "link")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.gray)
                 
                 Spacer()
                 
@@ -152,7 +152,7 @@ struct ParentControlView: View {
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .frame(width: 100)
                     Text("ALGO")
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.gray)
                 }
                 
                 Divider()
@@ -212,7 +212,7 @@ struct ParentControlView: View {
                             .fontWeight(.medium)
                         Text(merchant.category)
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.gray)
                     }
                     
                     Spacer()
@@ -245,7 +245,7 @@ struct ParentControlView: View {
                             .fontWeight(.medium)
                         Text(transaction.category)
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.gray)
                     }
                     
                     Spacer()
@@ -287,7 +287,7 @@ struct ParentControlView: View {
                             .foregroundColor(.green)
                         Text("Will be verified on-chain")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.gray)
                     }
                 }
             }

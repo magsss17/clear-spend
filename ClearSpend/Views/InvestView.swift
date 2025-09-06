@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct InvestView: View {
+    @EnvironmentObject var walletViewModel: WalletViewModel
     @State private var selectedInvestmentType = "Savings"
     let investmentTypes = ["Savings", "Stocks", "Crypto", "Education Fund"]
     
@@ -27,18 +28,18 @@ struct InvestView: View {
             
             HStack(spacing: 16) {
                 PortfolioCard(
-                    title: "Savings",
-                    amount: "25 ALGO",
+                    title: "Balance",
+                    amount: "\(walletViewModel.formattedBalance) ALGO",
                     percentage: "+5.2%",
                     icon: "banknote",
                     color: .green
                 )
                 
                 PortfolioCard(
-                    title: "Locked",
+                    title: "Profits",
                     amount: "100 ALGO",
                     percentage: "30 days",
-                    icon: "lock.fill",
+                    icon: "chart.line.uptrend.xyaxis",
                     color: .blue
                 )
             }
@@ -50,12 +51,13 @@ struct InvestView: View {
             Text("Investment Options")
                 .font(.headline)
             
-            ForEach(["High Yield Savings", "Teen Index Fund", "Crypto Basket"], id: \.self) { option in
+            ForEach(["Real Estate (Lofty)", "Liquid Staking (xAlgo)", "P2P Staking (Valar)"], id: \.self) { option in
                 InvestmentOptionCard(
                     title: option,
                     description: getDescription(for: option),
                     apy: getAPY(for: option),
-                    risk: getRisk(for: option)
+                    risk: getRisk(for: option),
+                    learnURL: getLearnURL(for: option)
                 )
             }
         }
@@ -78,13 +80,13 @@ struct InvestView: View {
                     
                     Text("Start your investment journey")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.gray)
                 }
                 
                 Spacer()
                 
                 Image(systemName: "chevron.right")
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.gray)
             }
             .padding()
             .background(Color.purple.opacity(0.05))
@@ -94,12 +96,12 @@ struct InvestView: View {
     
     private func getDescription(for option: String) -> String {
         switch option {
-        case "High Yield Savings":
-            return "Earn interest on your ALGO with low risk"
-        case "Teen Index Fund":
-            return "Diversified portfolio for young investors"
-        case "Crypto Basket":
-            return "Balanced mix of top cryptocurrencies"
+        case "Real Estate (Lofty)":
+            return "Invest in real estate through fractional ownership"
+        case "Liquid Staking (xAlgo)":
+            return "Stake ALGO and earn rewards while maintaining liquidity"
+        case "P2P Staking (Valar)":
+            return "Peer-to-peer staking with competitive rates"
         default:
             return ""
         }
@@ -107,19 +109,28 @@ struct InvestView: View {
     
     private func getAPY(for option: String) -> String {
         switch option {
-        case "High Yield Savings": return "3.5%"
-        case "Teen Index Fund": return "8.2%"
-        case "Crypto Basket": return "12.5%"
+        case "Real Estate (Lofty)": return "8-12%"
+        case "Liquid Staking (xAlgo)": return "5.51%"
+        case "P2P Staking (Valar)": return "5.17%"
         default: return "0%"
         }
     }
     
     private func getRisk(for option: String) -> String {
         switch option {
-        case "High Yield Savings": return "Low"
-        case "Teen Index Fund": return "Medium"
-        case "Crypto Basket": return "High"
+        case "Real Estate (Lofty)": return "Medium"
+        case "Liquid Staking (xAlgo)": return "Low"
+        case "P2P Staking (Valar)": return "Low"
         default: return "Unknown"
+        }
+    }
+    
+    private func getLearnURL(for option: String) -> String {
+        switch option {
+        case "Real Estate (Lofty)": return "https://www.lofty.ai/"
+        case "Liquid Staking (xAlgo)": return "https://algorand.co/staking-rewards"
+        case "P2P Staking (Valar)": return "https://stake.valar.solutions/"
+        default: return ""
         }
     }
 }
@@ -139,7 +150,7 @@ struct PortfolioCard: View {
                 
                 Text(title)
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.gray)
             }
             
             Text(amount)
@@ -162,6 +173,8 @@ struct InvestmentOptionCard: View {
     let description: String
     let apy: String
     let risk: String
+    let learnURL: String
+    @EnvironmentObject var walletViewModel: WalletViewModel
     
     var riskColor: Color {
         switch risk {
@@ -182,7 +195,7 @@ struct InvestmentOptionCard: View {
                     
                     Text(description)
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.gray)
                 }
                 
                 Spacer()
@@ -195,7 +208,7 @@ struct InvestmentOptionCard: View {
                     
                     Text("APY")
                         .font(.caption2)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.gray)
                 }
             }
             
@@ -206,16 +219,32 @@ struct InvestmentOptionCard: View {
                 
                 Spacer()
                 
-                Button("Invest") {
-                    // Investment action
+                HStack(spacing: 8) {
+                    Button("Learn") {
+                        if let url = URL(string: learnURL) {
+                            UIApplication.shared.open(url)
+                        }
+                    }
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(20)
+                    
+                    Button("Invest") {
+                        // Subtract $25 from balance
+                        walletViewModel.subtractFromBalance(25.0)
+                    }
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color.purple)
+                    .foregroundColor(.white)
+                    .cornerRadius(20)
                 }
-                .font(.caption)
-                .fontWeight(.medium)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 6)
-                .background(Color.purple)
-                .foregroundColor(.white)
-                .cornerRadius(20)
             }
         }
         .padding()
@@ -226,4 +255,5 @@ struct InvestmentOptionCard: View {
 
 #Preview {
     InvestView()
+        .environmentObject(WalletViewModel())
 }

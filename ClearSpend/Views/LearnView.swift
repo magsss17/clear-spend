@@ -17,11 +17,11 @@ struct LearnView: View {
                     
                     financialEducationModules
                     
-                    fraudPreventionEducation
+                    // fraudPreventionEducation
                     
-                    achievementSection
+                    // achievementSection
                     
-                    blockchainBasics
+                    // blockchainBasics
                 }
                 .padding()
             }
@@ -45,7 +45,7 @@ struct LearnView: View {
                     
                     Text("Good financial decisions = Higher credit limits & allowances")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.gray)
                 }
                 
                 Spacer()
@@ -63,7 +63,7 @@ struct LearnView: View {
                         .foregroundColor(.purple)
                     Text("Smart Purchases")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.gray)
                 }
                 
                 Spacer()
@@ -75,7 +75,7 @@ struct LearnView: View {
                         .foregroundColor(.green)
                     Text("Fraud Avoided")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.gray)
                 }
                 
                 Spacer()
@@ -87,7 +87,7 @@ struct LearnView: View {
                         .foregroundColor(.blue)
                     Text("Credit Score")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.gray)
                 }
             }
         }
@@ -120,13 +120,13 @@ struct LearnView: View {
                 HStack {
                     Text("Progress to +$25 Weekly Increase")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.gray)
                     
                     Spacer()
                     
                     Text("\(userXP)/500 XP")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.gray)
                 }
                 
                 ProgressView(value: Double(userXP), total: 500)
@@ -138,7 +138,7 @@ struct LearnView: View {
                     .foregroundColor(.yellow)
                 Text("Complete learning modules to unlock higher spending limits!")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.gray)
             }
         }
         .padding()
@@ -154,7 +154,7 @@ struct LearnView: View {
             
             Text("Complete these to earn higher credit limits and allowance increases!")
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundColor(.gray)
             
             ForEach(LearningModule.creditFocusedModules, id: \.id) { module in
                 ModuleCard(
@@ -168,6 +168,8 @@ struct LearnView: View {
         }
     }
     
+    // MARK: - Fraud Prevention Education
+    /*
     private var fraudPreventionEducation: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Learn Smart Money Habits")
@@ -233,6 +235,7 @@ struct LearnView: View {
         }
     }
     
+    */
     private var blockchainBasics: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Your Financial Future on Blockchain")
@@ -303,7 +306,7 @@ struct ModuleCard: View {
                     
                     Text(module.description)
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.gray)
                         .multilineTextAlignment(.leading)
                 }
                 
@@ -352,7 +355,7 @@ struct AchievementRow: View {
                     .fontWeight(.medium)
                 Text(description)
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.gray)
             }
             
             Spacer()
@@ -391,7 +394,7 @@ struct InfoCard: View {
                 
                 Text(description)
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.gray)
                     .fixedSize(horizontal: false, vertical: true)
             }
             
