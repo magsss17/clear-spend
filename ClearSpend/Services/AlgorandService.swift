@@ -6,6 +6,7 @@ class AlgorandService: ObservableObject {
     @Published var isConnected = false
     @Published var currentAddress: String?
     @Published var balance: Double = 0
+    @Published var asaBalance: Double = 150.0 // ClearSpend Dollar balance for main branch compatibility
     
     private let testnetURL = "https://testnet-api.algonode.cloud"
     private let testnetIndexer = "https://testnet-idx.algonode.cloud"
@@ -25,10 +26,26 @@ class AlgorandService: ObservableObject {
         // For hackathon demo - using mock data
         currentAddress = demoAddress
         balance = 150.0 // Demo balance in ALGO
+        asaBalance = 150.0 // ClearSpend Dollar balance
         isConnected = true
     }
     
+    // Main branch compatibility method
+    func refreshBalance() async {
+        // Simulate balance refresh
+        await Task.sleep(nanoseconds: 1_000_000_000) // 1 second delay
+        // In a real implementation, this would fetch from blockchain
+        asaBalance = 150.0
+        balance = 150.0
+    }
+    
     func processPurchase(merchant: String, amount: Double, category: String) async -> PurchaseResult {
+        // Call real backend API for purchase verification
+        return await verifyPurchaseWithBackend(merchant: merchant, amount: amount, category: category)
+    }
+    
+    // Main branch compatibility method with additional parameters
+    func processPurchase(merchant: String, amount: Double, category: String, purchaseJustification: PurchaseJustification, merchantReputationScore: Double, spendingIntegrityScore: Double, verificationProofs: [VerificationProof]) async -> PurchaseResult {
         // Call real backend API for purchase verification
         return await verifyPurchaseWithBackend(merchant: merchant, amount: amount, category: category)
     }
@@ -181,7 +198,7 @@ class AlgorandService: ObservableObject {
     }
     
     func getTransactionHistory() async -> [Transaction] {
-        // Return mock transaction history
+        // Return mock transaction history with enhanced data for main branch compatibility
         return [
             Transaction(
                 id: "1",
@@ -191,7 +208,19 @@ class AlgorandService: ObservableObject {
                 date: Date().addingTimeInterval(-86400),
                 status: .approved,
                 transactionHash: generateMockTransactionId(),
-                note: "Monthly subscription"
+                note: "Monthly subscription",
+                purchaseJustification: .approved_leisure,
+                merchantReputationScore: 8.5,
+                spendingIntegrityScore: 8.7,
+                verificationProofs: [
+                    VerificationProof(
+                        type: .merchantReputation,
+                        result: .passed,
+                        details: "Verified music streaming service",
+                        timestamp: Date().addingTimeInterval(-86400),
+                        blockchainHash: generateMockTransactionId()
+                    )
+                ]
             ),
             Transaction(
                 id: "2",
@@ -201,7 +230,19 @@ class AlgorandService: ObservableObject {
                 date: Date().addingTimeInterval(-172800),
                 status: .approved,
                 transactionHash: generateMockTransactionId(),
-                note: "School supplies"
+                note: "School supplies",
+                purchaseJustification: .education,
+                merchantReputationScore: 9.2,
+                spendingIntegrityScore: 9.1,
+                verificationProofs: [
+                    VerificationProof(
+                        type: .merchantReputation,
+                        result: .passed,
+                        details: "Verified e-commerce platform",
+                        timestamp: Date().addingTimeInterval(-172800),
+                        blockchainHash: generateMockTransactionId()
+                    )
+                ]
             ),
             Transaction(
                 id: "3",
@@ -211,7 +252,19 @@ class AlgorandService: ObservableObject {
                 date: Date().addingTimeInterval(-259200),
                 status: .rejected,
                 transactionHash: nil,
-                note: "Category restricted"
+                note: "Category restricted",
+                purchaseJustification: .approved_leisure,
+                merchantReputationScore: 7.0,
+                spendingIntegrityScore: 4.2,
+                verificationProofs: [
+                    VerificationProof(
+                        type: .categoryRestriction,
+                        result: .failed,
+                        details: "Gaming category blocked by parental controls",
+                        timestamp: Date().addingTimeInterval(-259200),
+                        blockchainHash: nil
+                    )
+                ]
             )
         ]
     }
