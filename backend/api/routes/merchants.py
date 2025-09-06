@@ -23,12 +23,19 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/merchants", tags=["merchants"])
 
-# Dependency injection
-def get_oracle_service() -> OracleService:
-    blockchain_service = BlockchainService()
-    return OracleService(blockchain_service)
+# Global shared oracle service instance
+_shared_oracle_service = None
 
-@router.get("/", response_model=Dict[str, MerchantAttestationResponse])
+def get_oracle_service() -> OracleService:
+    """Get shared oracle service instance"""
+    global _shared_oracle_service
+    if _shared_oracle_service is None:
+        blockchain_service = BlockchainService()
+        _shared_oracle_service = OracleService(blockchain_service)
+        logger.info("Created shared OracleService instance")
+    return _shared_oracle_service
+
+@router.get("/", response_model=Dict[str, List[MerchantAttestationResponse]])
 async def get_all_merchants(
     oracle_service: OracleService = Depends(get_oracle_service)
 ):
@@ -36,9 +43,9 @@ async def get_all_merchants(
     try:
         attestations = oracle_service.get_merchant_attestations()
         
-        response = {}
+        merchants = []
         for name, attestation in attestations.items():
-            response[name] = MerchantAttestationResponse(
+            merchants.append(MerchantAttestationResponse(
                 success=True,
                 merchant_name=attestation.merchant_name,
                 category=attestation.category,
@@ -47,9 +54,9 @@ async def get_all_merchants(
                 total_spent_today=attestation.total_spent_today,
                 parent_approved=attestation.parent_approved,
                 last_update=attestation.last_update
-            )
+            ))
         
-        return response
+        return {"merchants": merchants}
         
     except Exception as e:
         logger.error(f"Failed to get merchants: {e}")

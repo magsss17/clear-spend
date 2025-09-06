@@ -15,10 +15,17 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/purchases", tags=["purchases"])
 
-# Dependency injection
+# Global shared oracle service instance
+_shared_oracle_service = None
+
 def get_oracle_service() -> OracleService:
-    blockchain_service = BlockchainService()
-    return OracleService(blockchain_service)
+    """Get shared oracle service instance"""
+    global _shared_oracle_service
+    if _shared_oracle_service is None:
+        blockchain_service = BlockchainService()
+        _shared_oracle_service = OracleService(blockchain_service)
+        logger.info("Created shared OracleService instance")
+    return _shared_oracle_service
 
 @router.post("/verify", response_model=PurchaseResponse)
 async def verify_purchase(

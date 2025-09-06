@@ -6,6 +6,7 @@ class AlgorandService: ObservableObject {
     @Published var isConnected = false
     @Published var currentAddress: String?
     @Published var balance: Double = 0
+    @Published var asaBalance: Double = 150.0 // ALGO balance
     
     private let testnetURL = "https://testnet-api.algonode.cloud"
     private let testnetIndexer = "https://testnet-idx.algonode.cloud"
@@ -25,7 +26,16 @@ class AlgorandService: ObservableObject {
         // For hackathon demo - using mock data
         currentAddress = demoAddress
         balance = 150.0 // Demo balance in ALGO
+        asaBalance = 150.0 // ALGO balance
         isConnected = true
+    }
+    
+    func refreshBalance() async {
+        // Simulate balance refresh
+        try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 second delay
+        // In a real implementation, this would fetch from blockchain
+        asaBalance = 150.0
+        balance = 150.0
     }
     
     func processPurchase(merchant: String, amount: Double, category: String) async -> PurchaseResult {
@@ -158,21 +168,150 @@ class AlgorandService: ObservableObject {
         return approvedMerchants.contains(merchant)
     }
     
-    func fetchMerchants() async -> [String: [String: Any]] {
+    func fetchMerchants() async -> [ApprovedMerchant] {
         guard let url = URL(string: "\(backendURL)/api/v1/merchants/") else {
-            return [:]
+            print("❌ Invalid URL for fetching merchants")
+            return ApprovedMerchant.examples
         }
         
         do {
-            let (data, _) = try await URLSession.shared.data(from: url)
-            if let json = try JSONSerialization.jsonObject(with: data) as? [String: [String: Any]] {
-                return json
+            print("🔄 Fetching merchants from: \(url)")
+            let (data, response) = try await URLSession.shared.data(from: url)
+            
+            if let httpResponse = response as? HTTPURLResponse {
+                print("📡 Response status: \(httpResponse.statusCode)")
+            }
+            
+            // Print raw response for debugging
+            if let responseString = String(data: data, encoding: .utf8) {
+                print("📄 Raw response: \(responseString)")
+            }
+            
+            if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                print("📊 Parsed JSON keys: \(json.keys)")
+                
+                if let merchants = json["merchants"] as? [[String: Any]] {
+                    print("✅ Found \(merchants.count) merchants")
+                    
+                    let approvedMerchants = merchants.compactMap { merchantData -> ApprovedMerchant? in
+                        guard let name = merchantData["merchant_name"] as? String,
+                              let category = merchantData["category"] as? String,
+                              let isApproved = merchantData["is_approved"] as? Bool,
+                              let parentApproved = merchantData["parent_approved"] as? Bool,
+                              let dailyLimit = merchantData["daily_limit"] as? Int,
+                              let totalSpentToday = merchantData["total_spent_today"] as? Int,
+                              let lastUpdate = merchantData["last_update"] as? Int else {
+                            print("❌ Failed to parse merchant data: \(merchantData)")
+                            return nil
+                        }
+                        
+                        print("✅ Parsed merchant: \(name) (\(category))")
+                        
+                        return ApprovedMerchant(
+                            name: name,
+                            category: category,
+                            icon: "", // Will use computed property
+                            isVerified: true,
+                            reputationScore: 8.0,
+                            businessLicenseVerified: true,
+                            communityRating: 8.0,
+                            trustLevel: .good,
+                            verificationDate: Date(),
+                            dailyLimit: Double(dailyLimit),
+                            monthlyTransactions: 10,
+                            fraudReports: 0,
+                            isApproved: isApproved,
+                            parentApproved: parentApproved,
+                            totalSpentToday: totalSpentToday,
+                            lastUpdate: lastUpdate
+                        )
+                    }
+                    
+                    print("🎯 Returning \(approvedMerchants.count) approved merchants")
+                    return approvedMerchants
+                } else {
+                    print("❌ No 'merchants' key found in response")
+                }
+            } else {
+                print("❌ Failed to parse JSON response")
             }
         } catch {
-            print("Error fetching merchants: \(error)")
+            print("❌ Error fetching merchants: \(error)")
         }
         
-        return [:]
+        print("🔄 Falling back to example merchants")
+        return ApprovedMerchant.examples
+    }
+    
+    func addMerchant(name: String, category: String, dailyLimit: Int) async -> Bool {
+        guard let url = URL(string: "\(backendURL)/api/v1/merchants/") else {
+            print("❌ Invalid URL for adding merchant")
+            return false
+        }
+        
+        let requestData: [String: Any] = [
+            "merchant_name": name,
+            "category": category,
+            "is_approved": true,
+            "daily_limit": dailyLimit,
+            "parent_approved": true
+        ]
+        
+        print("🔄 Adding merchant: \(name) (\(category)) with limit: \(dailyLimit)")
+        print("📤 Request data: \(requestData)")
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: requestData)
+            
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            if let httpResponse = response as? HTTPURLResponse {
+                print("📡 Add merchant response status: \(httpResponse.statusCode)")
+                
+                if let responseString = String(data: data, encoding: .utf8) {
+                    print("📄 Add merchant response: \(responseString)")
+                }
+                
+                return httpResponse.statusCode == 200
+            }
+        } catch {
+            print("❌ Error adding merchant: \(error)")
+        }
+        
+        return false
+    }
+    
+    func updateParentApproval(merchantName: String, approved: Bool) async -> Bool {
+        guard let url = URL(string: "\(backendURL)/api/v1/merchants/\(merchantName)/parent-approval") else {
+            return false
+        }
+        
+        let requestData: [String: Any] = [
+            "merchant_name": merchantName,
+            "approved": approved
+        ]
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: requestData)
+            
+            let (_, response) = try await URLSession.shared.data(for: request)
+            
+            if let httpResponse = response as? HTTPURLResponse {
+                return httpResponse.statusCode == 200
+            }
+        } catch {
+            print("Error updating parent approval: \(error)")
+        }
+        
+        return false
     }
     
     private func generateMockTransactionId() -> String {
@@ -191,7 +330,11 @@ class AlgorandService: ObservableObject {
                 date: Date().addingTimeInterval(-86400),
                 status: .approved,
                 transactionHash: generateMockTransactionId(),
-                note: "Monthly subscription"
+                note: "Monthly subscription",
+                purchaseJustification: .approved_leisure,
+                merchantReputationScore: 8.5,
+                spendingIntegrityScore: 8.0,
+                verificationProofs: []
             ),
             Transaction(
                 id: "2",
@@ -201,7 +344,11 @@ class AlgorandService: ObservableObject {
                 date: Date().addingTimeInterval(-172800),
                 status: .approved,
                 transactionHash: generateMockTransactionId(),
-                note: "School supplies"
+                note: "School supplies",
+                purchaseJustification: .necessity,
+                merchantReputationScore: 9.2,
+                spendingIntegrityScore: 8.5,
+                verificationProofs: []
             ),
             Transaction(
                 id: "3",
@@ -211,7 +358,11 @@ class AlgorandService: ObservableObject {
                 date: Date().addingTimeInterval(-259200),
                 status: .rejected,
                 transactionHash: nil,
-                note: "Category restricted"
+                note: "Category restricted",
+                purchaseJustification: nil,
+                merchantReputationScore: 7.5,
+                spendingIntegrityScore: 3.0,
+                verificationProofs: []
             )
         ]
     }

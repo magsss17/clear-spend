@@ -11,6 +11,10 @@ struct ParentControlView: View {
     @State private var newMerchantCategory = "Shopping"
     @State private var allowanceAmount = "50.00"
     @State private var isPaused = false
+    @State private var approvedMerchants: [ApprovedMerchant] = []
+    @State private var isLoadingMerchants = false
+    @State private var showingMerchantAlert = false
+    @State private var merchantAlertMessage = ""
     
     let categories = ["Shopping", "Food", "Entertainment", "Education", "Transportation", "Gaming"]
     let restrictedCategories = ["Gaming", "Gambling", "Adult Content"]
@@ -36,6 +40,14 @@ struct ParentControlView: View {
             .sheet(isPresented: $showingAddMerchant) {
                 addMerchantSheet
             }
+            .alert("Merchant Update", isPresented: $showingMerchantAlert) {
+                Button("OK") { }
+            } message: {
+                Text(merchantAlertMessage)
+            }
+            .task {
+                await loadMerchants()
+            }
         }
     }
     
@@ -47,7 +59,7 @@ struct ParentControlView: View {
                         .font(.headline)
                         .foregroundColor(.secondary)
                     
-                    Text("\(walletViewModel.formattedBalance) CSD")
+                    Text("\(walletViewModel.formattedBalance) ALGO")
                         .font(.system(size: 28, weight: .bold, design: .rounded))
                 }
                 
@@ -154,7 +166,7 @@ struct ParentControlView: View {
                     TextField("0.00", text: $dailyLimit)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .frame(width: 100)
-                    Text("CSD")
+                    Text("ALGO")
                         .foregroundColor(.secondary)
                 }
                 
@@ -202,29 +214,14 @@ struct ParentControlView: View {
                 .foregroundColor(.purple)
             }
             
-            ForEach(ApprovedMerchant.examples, id: \.id) { merchant in
-                HStack {
-                    Image(systemName: merchant.icon)
-                        .foregroundColor(.green)
-                        .frame(width: 30)
-                    
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(merchant.name)
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                        Text(merchant.category)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    
-                    Spacer()
-                    
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(.green)
+            if isLoadingMerchants {
+                ProgressView("Loading merchants...")
+                    .frame(maxWidth: .infinity)
+                    .padding()
+            } else {
+                ForEach(approvedMerchants, id: \.id) { merchant in
+                    merchantRow(merchant)
                 }
-                .padding()
-                .background(Color.gray.opacity(0.05))
-                .cornerRadius(10)
             }
         }
     }
@@ -313,19 +310,109 @@ struct ParentControlView: View {
     
     private func sendAllowance() async {
         // In production, this would create an ASA transfer transaction
-        print("Sending weekly allowance of \(allowanceAmount) CSD")
+        print("Sending weekly allowance of \(allowanceAmount) ALGO")
         
         // Mock the allowance transfer for demo
         await MainActor.run {
-            walletViewModel.balance += Double(allowanceAmount) ?? 50.0
+            walletViewModel.asaBalance += Double(allowanceAmount) ?? 50.0
         }
     }
     
+    private func merchantRow(_ merchant: ApprovedMerchant) -> some View {
+        HStack {
+            Image(systemName: merchant.categoryIcon)
+                .foregroundColor(merchant.parentApproved ? .green : .orange)
+                .frame(width: 30)
+            
+            VStack(alignment: .leading, spacing: 2) {
+                Text(merchant.name)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                
+                HStack {
+                    Text(merchant.category)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    
+                    Spacer()
+                    
+                    if merchant.dailyLimit > 0 {
+                        Text("\(String(format: "%.1f", merchant.dailyUsagePercent))% used")
+                            .font(.caption2)
+                            .foregroundColor(merchant.dailyUsagePercent > 80 ? .red : .secondary)
+                    }
+                }
+            }
+            
+            Spacer()
+            
+            VStack(spacing: 4) {
+                Button(action: {
+                    Task {
+                        await toggleParentApproval(merchant)
+                    }
+                }) {
+                    Image(systemName: merchant.parentApproved ? "checkmark.circle.fill" : "xmark.circle.fill")
+                        .foregroundColor(merchant.parentApproved ? .green : .red)
+                }
+                
+                Text(merchant.parentApproved ? "Approved" : "Blocked")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding()
+        .background(Color.gray.opacity(0.05))
+        .cornerRadius(10)
+    }
+    
+    private func loadMerchants() async {
+        isLoadingMerchants = true
+        approvedMerchants = await algorandService.fetchMerchants()
+        isLoadingMerchants = false
+    }
+    
+    private func toggleParentApproval(_ merchant: ApprovedMerchant) async {
+        let newApproval = !merchant.parentApproved
+        let success = await algorandService.updateParentApproval(
+            merchantName: merchant.name,
+            approved: newApproval
+        )
+        
+        if success {
+            merchantAlertMessage = "\(merchant.name) has been \(newApproval ? "approved" : "blocked")"
+            await loadMerchants() // Refresh the list
+        } else {
+            merchantAlertMessage = "Failed to update approval for \(merchant.name)"
+        }
+        
+        showingMerchantAlert = true
+    }
+    
     private func addMerchant() {
-        // In production, this would create an on-chain attestation
-        print("Adding merchant attestation: \(newMerchantName) - \(newMerchantCategory)")
-        newMerchantName = ""
-        newMerchantCategory = "Shopping"
+        Task {
+            let dailyLimitMicroAlgos = Int(Double(dailyLimit) ?? 50.0 * 1_000_000)
+            let success = await algorandService.addMerchant(
+                name: newMerchantName,
+                category: newMerchantCategory,
+                dailyLimit: dailyLimitMicroAlgos
+            )
+            
+            if success {
+                merchantAlertMessage = "\(newMerchantName) has been added successfully"
+                
+                // Add a small delay to ensure backend has processed the request
+                try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
+                
+                await loadMerchants() // Refresh the list
+                newMerchantName = ""
+                newMerchantCategory = "Shopping"
+            } else {
+                merchantAlertMessage = "Failed to add \(newMerchantName)"
+            }
+            
+            showingMerchantAlert = true
+        }
     }
 }
 

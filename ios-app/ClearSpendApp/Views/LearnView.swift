@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct LearnView: View {
+    @EnvironmentObject var algorandService: AlgorandService
     @State private var selectedModule: LearningModule?
     @State private var userXP = 325
     @State private var currentLevel = 3
@@ -10,47 +11,114 @@ struct LearnView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 24) {
-                    progressHeader
+                    creditBuildingHeader
                     
-                    learningModules
+                    allowanceProgressSection
+                    
+                    financialEducationModules
+                    
+                    fraudPreventionEducation
                     
                     achievementSection
                     
-                    blockchainEducation
+                    blockchainBasics
                 }
                 .padding()
             }
-            .navigationTitle("Learn")
+            .background(Color.white)
+            .navigationTitle("Learn & Earn")
+            .navigationBarTitleDisplayMode(.large)
             .sheet(item: $selectedModule) { module in
                 LearningModuleDetailView(module: module, userXP: $userXP, completedModules: $completedModules)
             }
+            .background(Color.white)
         }
     }
     
-    private var progressHeader: some View {
+    private var creditBuildingHeader: some View {
         VStack(spacing: 16) {
             HStack {
-                VStack(alignment: .leading) {
-                    Text("Level \(currentLevel) - Smart Spender")
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Learn Smart Spending")
                         .font(.title2)
                         .fontWeight(.bold)
                     
-                    Text("\(userXP) XP earned!")
+                    Text("Good financial decisions = Higher credit limits & allowances")
                         .font(.subheadline)
-                        .foregroundColor(.green)
+                        .foregroundColor(.secondary)
                 }
                 
                 Spacer()
                 
-                Image(systemName: "star.fill")
+                Image(systemName: "graduationcap.fill")
                     .font(.system(size: 40))
-                    .foregroundColor(.yellow)
+                    .foregroundColor(.green)
             }
             
-            // XP Progress bar
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("23")
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .foregroundColor(.purple)
+                    Text("Smart Purchases")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                
+                Spacer()
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("179.97 ALGO")
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .foregroundColor(.green)
+                    Text("Fraud Avoided")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                
+                Spacer()
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("742")
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .foregroundColor(.blue)
+                    Text("Credit Score")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+        }
+        .padding()
+        .background(Color.white)
+        .cornerRadius(16)
+        .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
+    }
+    
+    private var allowanceProgressSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Text("Earn Higher Allowances")
+                    .font(.headline)
+                
+                Spacer()
+                
+                Text("Level 3")
+                    .font(.caption)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.purple)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color.white)
+                    .cornerRadius(8)
+                    .shadow(color: .purple.opacity(0.2), radius: 2, x: 0, y: 1)
+            }
+            
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
-                    Text("Progress to Level \(currentLevel + 1)")
+                    Text("Progress to +25 ALGO Weekly Increase")
                         .font(.caption)
                         .foregroundColor(.secondary)
                     
@@ -62,26 +130,33 @@ struct LearnView: View {
                 }
                 
                 ProgressView(value: Double(userXP), total: 500)
-                    .progressViewStyle(LinearProgressViewStyle(tint: .purple))
+                    .progressViewStyle(LinearProgressViewStyle(tint: .green))
+            }
+            
+            HStack {
+                Image(systemName: "star.fill")
+                    .foregroundColor(.yellow)
+                Text("Complete learning modules to unlock higher spending limits!")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
             }
         }
         .padding()
-        .background(
-            LinearGradient(
-                colors: [Color.purple.opacity(0.1), Color.blue.opacity(0.05)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        )
-        .cornerRadius(16)
+        .background(Color.white)
+        .cornerRadius(12)
+        .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 1)
     }
     
-    private var learningModules: some View {
+    private var financialEducationModules: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Financial Education")
+            Text("Financial Education Modules")
                 .font(.headline)
             
-            ForEach(LearningModule.allModules, id: \.id) { module in
+            Text("Complete these to earn higher credit limits and allowance increases!")
+                .font(.caption)
+                .foregroundColor(.secondary)
+            
+            ForEach(LearningModule.creditFocusedModules, id: \.id) { module in
                 ModuleCard(
                     module: module,
                     isCompleted: completedModules.contains(module.id),
@@ -93,62 +168,114 @@ struct LearnView: View {
         }
     }
     
+    private var fraudPreventionEducation: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Learn Smart Money Habits")
+                .font(.headline)
+            
+            InfoCard(
+                title: "Smart Spending Decisions",
+                description: "Learn to identify good vs bad purchases. Smart decisions increase your credit score and unlock higher allowances.",
+                icon: "brain.head.profile",
+                color: .green
+            )
+            
+            InfoCard(
+                title: "Fraud Prevention = More Trust",
+                description: "When you avoid fraudulent merchants, parents see you're responsible and increase your spending limits.",
+                icon: "checkmark.shield.fill",
+                color: .blue
+            )
+            
+            InfoCard(
+                title: "Budget Tracking Rewards",
+                description: "Stay under your daily limits and complete educational modules to earn allowance bonuses and credit increases.",
+                icon: "target",
+                color: .orange
+            )
+        }
+    }
+    
     private var achievementSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Recent Achievements")
+            Text("Credit Building Milestones")
                 .font(.headline)
             
             VStack(spacing: 12) {
                 AchievementRow(
-                    title: "Smart Spender",
-                    description: "Made 5 approved purchases",
-                    icon: "checkmark.circle.fill",
+                    title: "Smart Budgeter (+10 ALGO/week)",
+                    description: "Completed budgeting module - earned allowance increase",
+                    icon: "chart.pie.fill",
                     isUnlocked: true
                 )
                 
                 AchievementRow(
-                    title: "Budget Master",
-                    description: "Stayed under daily limit for 7 days",
+                    title: "Fraud Fighter (+15 ALGO credit)",
+                    description: "Avoided scams - unlocked higher credit limits",
+                    icon: "shield.fill",
+                    isUnlocked: true
+                )
+                
+                AchievementRow(
+                    title: "Savings Master (2x multiplier)",
+                    description: "Hit savings goals - earned double allowances",
                     icon: "target",
-                    isUnlocked: true
+                    isUnlocked: false
                 )
                 
                 AchievementRow(
-                    title: "Crypto Native",
-                    description: "Learn about blockchain basics",
-                    icon: "link",
-                    isUnlocked: false
+                    title: "Credit Score NFT (Adult Access)",
+                    description: "Built permanent financial reputation",
+                    icon: "star.fill",
+                    isUnlocked: true
                 )
             }
         }
     }
     
-    private var blockchainEducation: some View {
+    private var blockchainBasics: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Understanding Your Money")
+            Text("Your Financial Future on Blockchain")
                 .font(.headline)
             
             VStack(spacing: 12) {
                 InfoCard(
-                    title: "Your ClearSpend Dollars",
-                    description: "CSD tokens are real digital assets on Algorand blockchain - they're like digital cash that only you control!",
-                    icon: "dollarsign.circle.fill",
-                    color: .green
-                )
-                
-                InfoCard(
-                    title: "Every Purchase is Verified",
-                    description: "Before your money moves, smart contracts check if the purchase is allowed. This prevents overspending automatically!",
-                    icon: "checkmark.shield.fill",
+                    title: "Permanent Credit History",
+                    description: "Your responsible purchases create an immutable record on Algorand - banks can verify your creditworthiness instantly.",
+                    icon: "doc.text.fill",
                     color: .blue
                 )
                 
                 InfoCard(
-                    title: "Building Credit History",
-                    description: "Every responsible purchase builds your on-chain reputation - creating a verifiable credit history for your future!",
-                    icon: "chart.line.uptrend.xyaxis",
+                    title: "Portable Reputation",
+                    description: "Your Credit Score NFT travels with you to any bank or financial institution - no more starting from zero.",
+                    icon: "arrow.triangle.2.circlepath",
+                    color: .green
+                )
+                
+                InfoCard(
+                    title: "Revolutionary Protection",
+                    description: "Be part of the first generation to have fraud prevented BEFORE payment, not detected after - this is the future of finance.",
+                    icon: "sparkles",
                     color: .purple
                 )
+            }
+            
+            Button(action: {
+                if let url = URL(string: "https://testnet.algoexplorer.io/asset/745477123") {
+                    UIApplication.shared.open(url)
+                }
+            }) {
+                HStack {
+                    Text("View Your Credit Score NFT")
+                        .fontWeight(.semibold)
+                    Image(systemName: "arrow.up.right")
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.purple)
+                .foregroundColor(.white)
+                .cornerRadius(12)
             }
         }
     }
@@ -198,8 +325,9 @@ struct ModuleCard: View {
                 }
             }
             .padding()
-            .background(Color.gray.opacity(0.05))
+            .background(Color.white)
             .cornerRadius(12)
+            .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
         }
         .disabled(isLocked)
         .buttonStyle(PlainButtonStyle())
@@ -237,8 +365,9 @@ struct AchievementRow: View {
             }
         }
         .padding()
-        .background(Color.gray.opacity(0.05))
+        .background(Color.white)
         .cornerRadius(10)
+        .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
     }
 }
 
@@ -269,8 +398,9 @@ struct InfoCard: View {
             Spacer(minLength: 0)
         }
         .padding()
-        .background(color.opacity(0.1))
+        .background(Color.white)
         .cornerRadius(12)
+        .shadow(color: color.opacity(0.1), radius: 4, x: 0, y: 1)
     }
 }
 
@@ -345,68 +475,72 @@ struct LearningModule: Identifiable {
         return currentLevel >= requiredLevel
     }
     
-    static let allModules = [
+    static let creditFocusedModules = [
         LearningModule(
             id: "budgeting_basics",
-            title: "Budgeting Basics",
-            description: "Learn how to create and stick to a budget",
+            title: "Smart Budgeting = Higher Allowances",
+            description: "Learn budgeting to unlock +10 ALGO weekly increases",
             icon: "chart.pie.fill",
             xpReward: 50,
             requiredLevel: 1,
             content: [
-                "A budget is your spending plan - it helps you decide where your money goes before you spend it.",
-                "The 50/30/20 rule: 50% for needs, 30% for wants, 20% for savings.",
-                "Track your spending for a week to see where your money really goes.",
-                "Great job! You've learned the basics of budgeting. Remember: every dollar should have a purpose!"
+                "Smart budgeting shows parents you're responsible with money - leading to higher allowances and credit limits!",
+                "The 50/30/20 rule: 50% for needs, 30% for wants, 20% for savings. Following this can unlock bonus allowances.",
+                "Track your spending to show parents exactly where your money goes - transparency builds trust.",
+                "Congratulations! You've mastered budgeting basics. Your responsible planning has earned you +10 ALGO weekly allowance increase!"
             ]
         ),
         
         LearningModule(
             id: "smart_spending",
-            title: "Smart Spending",
-            description: "Make better purchase decisions",
-            icon: "brain.head.profile",
+            title: "Fraud Avoidance = Credit Boost",
+            description: "Learn to spot scams and earn +15 ALGO credit increases",
+            icon: "shield.fill",
             xpReward: 75,
             requiredLevel: 2,
             content: [
-                "Before buying anything, ask yourself: Do I need this or just want it?",
-                "Use the 24-hour rule: Wait a day before making non-essential purchases.",
-                "Compare prices across different stores and websites.",
-                "Consider the cost per use - expensive items can be worth it if you use them often.",
-                "Excellent! You're now a smart spender who makes thoughtful purchase decisions."
+                "Avoiding fraudulent merchants shows excellent judgment - parents reward this with higher credit limits!",
+                "Red flags: Deals that seem too good to be true, unfamiliar websites, urgent purchase pressure.",
+                "Always verify merchant legitimacy before purchasing. ClearSpend's attestation network helps protect you.",
+                "Smart fraud avoidance has unlocked +15 ALGO credit limit increase and shows you're ready for more financial responsibility!"
             ]
         ),
         
         LearningModule(
             id: "saving_strategies",
-            title: "Saving Strategies",
-            description: "Build wealth with smart saving habits",
-            icon: "banknote.fill",
+            title: "Saving Goals = Allowance Multipliers",
+            description: "Hit savings targets to unlock 2x weekly allowances",
+            icon: "target",
             xpReward: 100,
             requiredLevel: 3,
             content: [
-                "Pay yourself first - save money before spending on anything else.",
-                "Start small: even $1 per day adds up to $365 per year!",
-                "Set specific savings goals: vacation, car, college, emergency fund.",
-                "Automate your savings so you don't have to think about it.",
-                "Amazing! You now understand how small savings can grow into big opportunities."
+                "Parents love seeing teens save money! Reaching savings goals can unlock 2x weekly allowance multipliers.",
+                "Start with small goals: Save 25 ALGO this month to unlock bonus allowances next month.",
+                "Set specific targets: Phone upgrade fund, college savings, emergency buffer - each goal shows maturity.",
+                "Automate savings to show consistency. Parents reward reliability with increased financial freedom.",
+                "Congratulations! Your smart saving habits have earned you 2x allowance multipliers and shown true financial maturity!"
             ]
         ),
         
         LearningModule(
-            id: "blockchain_money",
-            title: "Digital Money & Blockchain",
-            description: "Understand how your ClearSpend Dollars work",
+            id: "blockchain_credit",
+            title: "Blockchain Credit = Adult Financial Access",
+            description: "Understand how blockchain builds your financial future",
             icon: "link.circle.fill",
             xpReward: 125,
             requiredLevel: 4,
             content: [
-                "Blockchain is like a digital ledger that records all transactions permanently.",
-                "Your ClearSpend Dollars (CSD) are real tokens on the Algorand blockchain.",
-                "Smart contracts automatically enforce spending rules set by your parents.",
-                "Every purchase creates a permanent record that builds your financial reputation.",
-                "Congratulations! You understand the future of money and how blockchain protects your finances."
+                "Your blockchain credit history follows you to any bank or financial institution - no more starting from zero!",
+                "Every smart purchase decision is permanently recorded, creating unbreakable proof of your financial responsibility.",
+                "Traditional credit cards require income verification. Your ClearSpend history can bypass these requirements.",
+                "Your Credit Score NFT is portable proof of responsible spending - banks will compete for customers like you!",
+                "Amazing! You now understand how blockchain technology will give you a massive advantage in adult financial life."
             ]
         )
     ]
+}
+
+#Preview {
+    LearnView()
+        .environmentObject(AlgorandService())
 }

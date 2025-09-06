@@ -8,6 +8,7 @@ struct TransactionRowView: View {
         case .approved: return .green
         case .rejected: return .red
         case .pending: return .orange
+        case .requiresParentApproval: return .blue
         }
     }
     
@@ -75,33 +76,18 @@ struct TransactionRowView: View {
 }
 
 #Preview {
-    VStack {
-        TransactionRowView(
-            transaction: Transaction(
-                id: "1",
-                merchant: "Spotify",
-                category: "Entertainment",
-                amount: 9.99,
-                date: Date(),
-                status: .approved,
-                transactionHash: "DEMO123",
-                note: nil
-            )
-        )
-        .padding()
-        
-        TransactionRowView(
-            transaction: Transaction(
-                id: "2",
-                merchant: "Steam",
-                category: "Gaming",
-                amount: 59.99,
-                date: Date(),
-                status: .rejected,
-                transactionHash: nil,
-                note: "Category restricted"
-            )
-        )
-        .padding()
-    }
+    TransactionRowView(transaction: Transaction(
+        id: "1",
+        merchant: "Amazon",
+        category: "Shopping",
+        amount: 25.50,
+        date: Date(),
+        status: .approved,
+        transactionHash: "ABC123",
+        note: "Test purchase",
+        purchaseJustification: .necessity,
+        merchantReputationScore: 9.2,
+        spendingIntegrityScore: 8.5,
+        verificationProofs: []
+    ))
 }

@@ -64,8 +64,7 @@ def verify_purchase(
 2. **Teen Makes Purchase**:
    - iOS app calls `verify_purchase()`
    - Contract checks all rules instantly
-   - Returns approval/rejection
-
+ is 
 3. **Real-Time Updates**:
    - Tracks daily spending automatically
    - Updates limits in real-time
