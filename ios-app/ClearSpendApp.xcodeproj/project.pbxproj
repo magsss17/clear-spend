@@ -7,41 +7,43 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A1234567890ABCDEF001 /* ClearSpendApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF002 /* ClearSpendApp.swift */; };
-		A1234567890ABCDEF003 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF004 /* ContentView.swift */; };
-		A1234567890ABCDEF005 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF006 /* HomeView.swift */; };
-		A1234567890ABCDEF007 /* SpendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF008 /* SpendView.swift */; };
-		A1234567890ABCDEF009 /* InvestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF010 /* InvestView.swift */; };
-		A1234567890ABCDEF011 /* LearnView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF012 /* LearnView.swift */; };
-		A1234567890ABCDEF013 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF014 /* SettingsView.swift */; };
-		A1234567890ABCDEF015 /* TransactionHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF016 /* TransactionHistoryView.swift */; };
-		A1234567890ABCDEF017 /* TransactionRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF018 /* TransactionRowView.swift */; };
-		A1234567890ABCDEF019 /* PurchaseResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF020 /* PurchaseResultView.swift */; };
-		A1234567890ABCDEF021 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF022 /* Transaction.swift */; };
-		A1234567890ABCDEF023 /* AlgorandService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF024 /* AlgorandService.swift */; };
-		A1234567890ABCDEF025 /* WalletViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF026 /* WalletViewModel.swift */; };
+		B1234567890ABCDEF001 /* ClearSpendApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1234567890ABCDEF002 /* ClearSpendApp.swift */; };
+		B1234567890ABCDEF003 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1234567890ABCDEF004 /* ContentView.swift */; };
+		B1234567890ABCDEF005 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1234567890ABCDEF006 /* HomeView.swift */; };
+		B1234567890ABCDEF007 /* SpendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1234567890ABCDEF008 /* SpendView.swift */; };
+		B1234567890ABCDEF009 /* InvestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1234567890ABCDEF010 /* InvestView.swift */; };
+		B1234567890ABCDEF011 /* LearnView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1234567890ABCDEF012 /* LearnView.swift */; };
+		B1234567890ABCDEF013 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1234567890ABCDEF014 /* SettingsView.swift */; };
+		B1234567890ABCDEF015 /* TransactionHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1234567890ABCDEF016 /* TransactionHistoryView.swift */; };
+		B1234567890ABCDEF017 /* TransactionRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1234567890ABCDEF018 /* TransactionRowView.swift */; };
+		B1234567890ABCDEF019 /* PurchaseResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1234567890ABCDEF020 /* PurchaseResultView.swift */; };
+		B1234567890ABCDEF021 /* ParentControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1234567890ABCDEF022 /* ParentControlView.swift */; };
+		B1234567890ABCDEF023 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1234567890ABCDEF024 /* Transaction.swift */; };
+		B1234567890ABCDEF025 /* AlgorandService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1234567890ABCDEF026 /* AlgorandService.swift */; };
+		B1234567890ABCDEF027 /* WalletViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1234567890ABCDEF028 /* WalletViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		A1234567890ABCDEF001 /* ClearSpendApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ClearSpendApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A1234567890ABCDEF002 /* ClearSpendApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearSpendApp.swift; sourceTree = "<group>"; };
-		A1234567890ABCDEF004 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		A1234567890ABCDEF006 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
-		A1234567890ABCDEF008 /* SpendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendView.swift; sourceTree = "<group>"; };
-		A1234567890ABCDEF010 /* InvestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvestView.swift; sourceTree = "<group>"; };
-		A1234567890ABCDEF012 /* LearnView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearnView.swift; sourceTree = "<group>"; };
-		A1234567890ABCDEF014 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		A1234567890ABCDEF016 /* TransactionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionHistoryView.swift; sourceTree = "<group>"; };
-		A1234567890ABCDEF018 /* TransactionRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionRowView.swift; sourceTree = "<group>"; };
-		A1234567890ABCDEF020 /* PurchaseResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseResultView.swift; sourceTree = "<group>"; };
-		A1234567890ABCDEF022 /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
-		A1234567890ABCDEF024 /* AlgorandService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgorandService.swift; sourceTree = "<group>"; };
-		A1234567890ABCDEF026 /* WalletViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletViewModel.swift; sourceTree = "<group>"; };
-		A1234567890ABCDEF027 /* SETUP.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = SETUP.md; sourceTree = "<group>"; };
+		B1234567890ABCDEF001 /* ClearSpendApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ClearSpendApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B1234567890ABCDEF002 /* ClearSpendApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearSpendApp.swift; sourceTree = "<group>"; };
+		B1234567890ABCDEF004 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		B1234567890ABCDEF006 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		B1234567890ABCDEF008 /* SpendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendView.swift; sourceTree = "<group>"; };
+		B1234567890ABCDEF010 /* InvestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvestView.swift; sourceTree = "<group>"; };
+		B1234567890ABCDEF012 /* LearnView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearnView.swift; sourceTree = "<group>"; };
+		B1234567890ABCDEF014 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		B1234567890ABCDEF016 /* TransactionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionHistoryView.swift; sourceTree = "<group>"; };
+		B1234567890ABCDEF018 /* TransactionRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionRowView.swift; sourceTree = "<group>"; };
+		B1234567890ABCDEF020 /* PurchaseResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseResultView.swift; sourceTree = "<group>"; };
+		B1234567890ABCDEF022 /* ParentControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParentControlView.swift; sourceTree = "<group>"; };
+		B1234567890ABCDEF024 /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
+		B1234567890ABCDEF026 /* AlgorandService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgorandService.swift; sourceTree = "<group>"; };
+		B1234567890ABCDEF028 /* WalletViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletViewModel.swift; sourceTree = "<group>"; };
+		B1234567890ABCDEF029 /* SETUP.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = SETUP.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		A1234567890ABCDEF028 /* Frameworks */ = {
+		B1234567890ABCDEF030 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -51,85 +53,94 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		A1234567890ABCDEF029 = {
+		B1234567890ABCDEF031 = {
 			isa = PBXGroup;
 			children = (
-				A1234567890ABCDEF030 /* ClearSpendApp */,
-				A1234567890ABCDEF031 /* Products */,
+				B1234567890ABCDEF032 /* ClearSpendApp */,
+				B1234567890ABCDEF033 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		A1234567890ABCDEF030 /* ClearSpendApp */ = {
+		B1234567890ABCDEF032 /* ClearSpendApp */ = {
 			isa = PBXGroup;
 			children = (
-				A1234567890ABCDEF002 /* ClearSpendApp.swift */,
-				A1234567890ABCDEF004 /* ContentView.swift */,
-				A1234567890ABCDEF032 /* Views */,
-				A1234567890ABCDEF033 /* Models */,
-				A1234567890ABCDEF034 /* Services */,
-				A1234567890ABCDEF035 /* ViewModels */,
-				A1234567890ABCDEF027 /* SETUP.md */,
+				B1234567890ABCDEF002 /* ClearSpendApp.swift */,
+				B1234567890ABCDEF004 /* ContentView.swift */,
+				B1234567890ABCDEF034 /* Views */,
+				B1234567890ABCDEF035 /* Models */,
+				B1234567890ABCDEF036 /* Services */,
+				B1234567890ABCDEF037 /* ViewModels */,
+				B1234567890ABCDEF038 /* Resources */,
+				B1234567890ABCDEF029 /* SETUP.md */,
 			);
 			path = ClearSpendApp;
 			sourceTree = "<group>";
 		};
-		A1234567890ABCDEF031 /* Products */ = {
+		B1234567890ABCDEF033 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A1234567890ABCDEF001 /* ClearSpendApp.app */,
+				B1234567890ABCDEF001 /* ClearSpendApp.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		A1234567890ABCDEF032 /* Views */ = {
+		B1234567890ABCDEF034 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				A1234567890ABCDEF006 /* HomeView.swift */,
-				A1234567890ABCDEF008 /* SpendView.swift */,
-				A1234567890ABCDEF010 /* InvestView.swift */,
-				A1234567890ABCDEF012 /* LearnView.swift */,
-				A1234567890ABCDEF014 /* SettingsView.swift */,
-				A1234567890ABCDEF016 /* TransactionHistoryView.swift */,
-				A1234567890ABCDEF018 /* TransactionRowView.swift */,
-				A1234567890ABCDEF020 /* PurchaseResultView.swift */,
+				B1234567890ABCDEF006 /* HomeView.swift */,
+				B1234567890ABCDEF008 /* SpendView.swift */,
+				B1234567890ABCDEF010 /* InvestView.swift */,
+				B1234567890ABCDEF012 /* LearnView.swift */,
+				B1234567890ABCDEF014 /* SettingsView.swift */,
+				B1234567890ABCDEF016 /* TransactionHistoryView.swift */,
+				B1234567890ABCDEF018 /* TransactionRowView.swift */,
+				B1234567890ABCDEF020 /* PurchaseResultView.swift */,
+				B1234567890ABCDEF022 /* ParentControlView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
 		};
-		A1234567890ABCDEF033 /* Models */ = {
+		B1234567890ABCDEF035 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				A1234567890ABCDEF022 /* Transaction.swift */,
+				B1234567890ABCDEF024 /* Transaction.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
 		};
-		A1234567890ABCDEF034 /* Services */ = {
+		B1234567890ABCDEF036 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				A1234567890ABCDEF024 /* AlgorandService.swift */,
+				B1234567890ABCDEF026 /* AlgorandService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
 		};
-		A1234567890ABCDEF035 /* ViewModels */ = {
+		B1234567890ABCDEF037 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
-				A1234567890ABCDEF026 /* WalletViewModel.swift */,
+				B1234567890ABCDEF028 /* WalletViewModel.swift */,
 			);
 			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		B1234567890ABCDEF038 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		A1234567890ABCDEF036 /* ClearSpendApp */ = {
+		B1234567890ABCDEF039 /* ClearSpendApp */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A1234567890ABCDEF037 /* Build configuration list for PBXNativeTarget "ClearSpendApp" */;
+			buildConfigurationList = B1234567890ABCDEF040 /* Build configuration list for PBXNativeTarget "ClearSpendApp" */;
 			buildPhases = (
-				A1234567890ABCDEF038 /* Sources */,
-				A1234567890ABCDEF028 /* Frameworks */,
-				A1234567890ABCDEF039 /* Resources */,
+				B1234567890ABCDEF041 /* Sources */,
+				B1234567890ABCDEF030 /* Frameworks */,
+				B1234567890ABCDEF042 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -137,25 +148,25 @@
 			);
 			name = ClearSpendApp;
 			productName = ClearSpendApp;
-			productReference = A1234567890ABCDEF001 /* ClearSpendApp.app */;
+			productReference = B1234567890ABCDEF001 /* ClearSpendApp.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		A1234567890ABCDEF040 /* Project object */ = {
+		B1234567890ABCDEF043 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1500;
 				LastUpgradeCheck = 1500;
 				TargetAttributes = {
-					A1234567890ABCDEF036 = {
+					B1234567890ABCDEF039 = {
 						CreatedOnToolsVersion = 15.0;
 					};
 				};
 			};
-			buildConfigurationList = A1234567890ABCDEF041 /* Build configuration list for PBXProject "ClearSpendApp" */;
+			buildConfigurationList = B1234567890ABCDEF044 /* Build configuration list for PBXProject "ClearSpendApp" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -163,18 +174,18 @@
 				en,
 				Base,
 			);
-			mainGroup = A1234567890ABCDEF029;
-			productRefGroup = A1234567890ABCDEF031 /* Products */;
+			mainGroup = B1234567890ABCDEF031;
+			productRefGroup = B1234567890ABCDEF033 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				A1234567890ABCDEF036 /* ClearSpendApp */,
+				B1234567890ABCDEF039 /* ClearSpendApp */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		A1234567890ABCDEF039 /* Resources */ = {
+		B1234567890ABCDEF042 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -184,30 +195,31 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		A1234567890ABCDEF038 /* Sources */ = {
+		B1234567890ABCDEF041 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A1234567890ABCDEF003 /* ContentView.swift in Sources */,
-				A1234567890ABCDEF005 /* HomeView.swift in Sources */,
-				A1234567890ABCDEF007 /* SpendView.swift in Sources */,
-				A1234567890ABCDEF009 /* InvestView.swift in Sources */,
-				A1234567890ABCDEF011 /* LearnView.swift in Sources */,
-				A1234567890ABCDEF013 /* SettingsView.swift in Sources */,
-				A1234567890ABCDEF015 /* TransactionHistoryView.swift in Sources */,
-				A1234567890ABCDEF017 /* TransactionRowView.swift in Sources */,
-				A1234567890ABCDEF019 /* PurchaseResultView.swift in Sources */,
-				A1234567890ABCDEF021 /* Transaction.swift in Sources */,
-				A1234567890ABCDEF023 /* AlgorandService.swift in Sources */,
-				A1234567890ABCDEF025 /* WalletViewModel.swift in Sources */,
-				A1234567890ABCDEF001 /* ClearSpendApp.swift in Sources */,
+				B1234567890ABCDEF001 /* ClearSpendApp.swift in Sources */,
+				B1234567890ABCDEF003 /* ContentView.swift in Sources */,
+				B1234567890ABCDEF005 /* HomeView.swift in Sources */,
+				B1234567890ABCDEF007 /* SpendView.swift in Sources */,
+				B1234567890ABCDEF009 /* InvestView.swift in Sources */,
+				B1234567890ABCDEF011 /* LearnView.swift in Sources */,
+				B1234567890ABCDEF013 /* SettingsView.swift in Sources */,
+				B1234567890ABCDEF015 /* TransactionHistoryView.swift in Sources */,
+				B1234567890ABCDEF017 /* TransactionRowView.swift in Sources */,
+				B1234567890ABCDEF019 /* PurchaseResultView.swift in Sources */,
+				B1234567890ABCDEF021 /* ParentControlView.swift in Sources */,
+				B1234567890ABCDEF023 /* Transaction.swift in Sources */,
+				B1234567890ABCDEF025 /* AlgorandService.swift in Sources */,
+				B1234567890ABCDEF027 /* WalletViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		A1234567890ABCDEF042 /* Debug */ = {
+		B1234567890ABCDEF045 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -270,7 +282,7 @@
 			};
 			name = Debug;
 		};
-		A1234567890ABCDEF043 /* Release */ = {
+		B1234567890ABCDEF046 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -326,7 +338,7 @@
 			};
 			name = Release;
 		};
-		A1234567890ABCDEF044 /* Debug */ = {
+		B1234567890ABCDEF047 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -354,7 +366,7 @@
 			};
 			name = Debug;
 		};
-		A1234567890ABCDEF045 /* Release */ = {
+		B1234567890ABCDEF048 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -385,25 +397,25 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		A1234567890ABCDEF037 /* Build configuration list for PBXNativeTarget "ClearSpendApp" */ = {
+		B1234567890ABCDEF040 /* Build configuration list for PBXNativeTarget "ClearSpendApp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				A1234567890ABCDEF044 /* Debug */,
-				A1234567890ABCDEF045 /* Release */,
+				B1234567890ABCDEF047 /* Debug */,
+				B1234567890ABCDEF048 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A1234567890ABCDEF041 /* Build configuration list for PBXProject "ClearSpendApp" */ = {
+		B1234567890ABCDEF044 /* Build configuration list for PBXProject "ClearSpendApp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				A1234567890ABCDEF042 /* Debug */,
-				A1234567890ABCDEF043 /* Release */,
+				B1234567890ABCDEF045 /* Debug */,
+				B1234567890ABCDEF046 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = A1234567890ABCDEF040 /* Project object */;
+	rootObject = B1234567890ABCDEF043 /* Project object */;
 }
