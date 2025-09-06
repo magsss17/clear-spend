@@ -54,7 +54,7 @@ struct SpendView: View {
                 .font(.caption)
                 .foregroundColor(.secondary)
             
-            Text("\(walletViewModel.formattedBalance) CSD")
+            Text("\(walletViewModel.formattedBalance) ALGO")
                 .font(.title)
                 .fontWeight(.bold)
                 .foregroundColor(.purple)
@@ -81,7 +81,7 @@ struct SpendView: View {
             }
             
             VStack(alignment: .leading, spacing: 8) {
-                Text("Amount (CSD)")
+                Text("Amount (ALGO)")
                     .font(.caption)
                     .foregroundColor(.secondary)
                 

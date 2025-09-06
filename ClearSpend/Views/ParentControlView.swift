@@ -49,7 +49,7 @@ struct ParentControlView: View {
                         .font(.headline)
                         .foregroundColor(.secondary)
                     
-                    Text("\(walletViewModel.formattedBalance) CSD")
+                    Text("\(walletViewModel.formattedBalance) ALGO")
                         .font(.system(size: 28, weight: .bold, design: .rounded))
                 }
                 
@@ -151,7 +151,7 @@ struct ParentControlView: View {
                     TextField("0.00", text: $dailyLimit)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .frame(width: 100)
-                    Text("CSD")
+                    Text("ALGO")
                         .foregroundColor(.secondary)
                 }
                 
@@ -313,7 +313,7 @@ struct ParentControlView: View {
     
     private func sendAllowance() async {
         // In production, this would create an ASA transfer transaction
-        print("Sending weekly allowance of \(allowanceAmount) CSD")
+        print("Sending weekly allowance of \(allowanceAmount) ALGO")
         
         // Mock the allowance transfer for demo
         await MainActor.run {

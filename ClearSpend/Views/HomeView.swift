@@ -54,7 +54,7 @@ struct HomeView: View {
                 Text("\(walletViewModel.formattedBalance)")
                     .font(.system(size: 42, weight: .bold, design: .rounded))
                 
-                Text("CSD")
+                Text("ALGO")
                     .font(.title3)
                     .foregroundColor(.secondary)
                     .padding(.bottom, 6)
@@ -74,7 +74,7 @@ struct HomeView: View {
                 
                 Spacer()
                 
-                Text("+$50 CSD (earned through education)")
+                Text("+50 ALGO (earned through education)")
                     .font(.caption)
                     .fontWeight(.semibold)
                     .foregroundColor(.green)
