@@ -2,10 +2,8 @@ import SwiftUI
 
 struct LearnView: View {
     @EnvironmentObject var algorandService: AlgorandService
-    @State private var selectedModule: LearningModule?
     @State private var userXP = 325
     @State private var currentLevel = 3
-    @State private var completedModules: Set<String> = ["budgeting_basics", "smart_spending"]
     
     var body: some View {
         NavigationStack {
@@ -32,9 +30,6 @@ struct LearnView: View {
             .background(Color.white)
             .navigationTitle("Learn & Earn")
             .navigationBarTitleDisplayMode(.large)
-            .sheet(item: $selectedModule) { module in
-                LearningModuleDetailView(module: module, userXP: $userXP, completedModules: $completedModules)
-            }
             .background(Color.white)
         }
     }
@@ -153,24 +148,13 @@ struct LearnView: View {
     
     private var financialEducationModules: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Financial Education Modules")
+            Text("Financial Education Resources")
                 .font(.headline)
             
-            Text("Complete these to earn higher credit limits and allowance increases!")
+            Text("Learn from trusted financial education sources")
                 .font(.caption)
                 .foregroundColor(.gray)
             
-            ForEach(LearningModule.creditFocusedModules, id: \.id) { module in
-                ModuleCard(
-                    module: module,
-                    isCompleted: completedModules.contains(module.id),
-                    isLocked: !module.isUnlocked(currentLevel: currentLevel)
-                ) {
-                    selectedModule = module
-                }
-            }
-            
-            // Additional educational resources with hyperlinks
             InfoCard(
                 title: "Smart budgeting",
                 description: "Learn popular budgeting strategies to manage your money effectively and build long-term wealth.",
@@ -365,58 +349,6 @@ struct LearnView: View {
     }
 }
 
-struct ModuleCard: View {
-    let module: LearningModule
-    let isCompleted: Bool
-    let isLocked: Bool
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            HStack {
-                Image(systemName: module.icon)
-                    .font(.title2)
-                    .foregroundColor(isLocked ? .gray : .purple)
-                    .frame(width: 40)
-                
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(module.title)
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                        .multilineTextAlignment(.leading)
-                    
-                    Text(module.description)
-                        .font(.caption)
-                        .foregroundColor(.gray)
-                        .multilineTextAlignment(.leading)
-                }
-                
-                Spacer()
-                
-                VStack {
-                    if isCompleted {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(.green)
-                    } else if isLocked {
-                        Image(systemName: "lock.fill")
-                            .foregroundColor(.gray)
-                    } else {
-                        Text("+\(module.xpReward)")
-                            .font(.caption)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.purple)
-                    }
-                }
-            }
-            .padding()
-            .background(Color.white)
-            .cornerRadius(12)
-            .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
-        }
-        .disabled(isLocked)
-        .buttonStyle(PlainButtonStyle())
-    }
-}
 
 struct AchievementRow: View {
     let title: String
@@ -512,138 +444,4 @@ struct InfoCard: View {
     }
 }
 
-struct LearningModuleDetailView: View {
-    let module: LearningModule
-    @Binding var userXP: Int
-    @Binding var completedModules: Set<String>
-    @Environment(\.dismiss) var dismiss
-    
-    @State private var currentStep = 0
-    @State private var isCompleted = false
-    
-    var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(spacing: 24) {
-                    Text(module.content[currentStep])
-                        .font(.body)
-                        .multilineTextAlignment(.leading)
-                        .padding()
-                    
-                    if currentStep < module.content.count - 1 {
-                        Button("Next") {
-                            currentStep += 1
-                        }
-                        .buttonStyle(.borderedProminent)
-                    } else {
-                        Button("Complete Module (+\(module.xpReward) XP)") {
-                            completeModule()
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .disabled(isCompleted)
-                    }
-                }
-                .padding()
-            }
-            .navigationTitle(module.title)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") {
-                        dismiss()
-                    }
-                }
-            }
-        }
-    }
-    
-    private func completeModule() {
-        userXP += module.xpReward
-        completedModules.insert(module.id)
-        isCompleted = true
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            dismiss()
-        }
-    }
-}
 
-// MARK: - Data Models
-
-struct LearningModule: Identifiable {
-    let id: String
-    let title: String
-    let description: String
-    let icon: String
-    let xpReward: Int
-    let requiredLevel: Int
-    let content: [String]
-    
-    func isUnlocked(currentLevel: Int) -> Bool {
-        return currentLevel >= requiredLevel
-    }
-    
-    static let creditFocusedModules = [
-        LearningModule(
-            id: "budgeting_basics",
-            title: "Smart Budgeting = Higher Allowances", 
-            description: "Learn budgeting to unlock +$2 weekly increases",
-            icon: "chart.pie.fill",
-            xpReward: 50,
-            requiredLevel: 1,
-            content: [
-                "Smart budgeting shows parents you're responsible with money - leading to higher allowances and credit limits!",
-                "The 50/30/20 rule: 50% for needs, 30% for wants, 20% for savings. Following this can unlock bonus allowances.",
-                "Track your spending to show parents exactly where your money goes - transparency builds trust.",
-                "Congratulations! You've mastered budgeting basics. Your responsible planning has earned you +$2 weekly allowance increase!"
-            ]
-        ),
-        
-        LearningModule(
-            id: "smart_spending",
-            title: "Fraud Avoidance = Credit Boost",
-            description: "Learn to spot scams and earn +$2 credit increases",
-            icon: "shield.fill",
-            xpReward: 75,
-            requiredLevel: 2,
-            content: [
-                "Avoiding fraudulent merchants shows excellent judgment - parents reward this with higher credit limits!",
-                "Red flags: Deals that seem too good to be true, unfamiliar websites, urgent purchase pressure.",
-                "Always verify merchant legitimacy before purchasing. ClearSpend's attestation network helps protect you.",
-                "Smart fraud avoidance has unlocked +$2 credit limit increase and shows you're ready for more financial responsibility!"
-            ]
-        ),
-        
-        LearningModule(
-            id: "saving_strategies",
-            title: "Saving Goals = Allowance Multipliers",
-            description: "Hit savings targets to unlock 2x weekly $2 allowances",
-            icon: "target",
-            xpReward: 100,
-            requiredLevel: 3,
-            content: [
-                "Parents love seeing teens save money! Reaching savings goals can unlock 2x weekly allowance multipliers.",
-                "Start with small goals: Save $2 this month to unlock bonus allowances next month.",
-                "Set specific targets: Phone upgrade fund, college savings, emergency buffer - each goal shows maturity.",
-                "Automate savings to show consistency. Parents reward reliability with increased financial freedom.",
-                "Congratulations! Your smart saving habits have earned you 2x allowance multipliers and shown true financial maturity!"
-            ]
-        ),
-        
-        LearningModule(
-            id: "blockchain_credit",
-            title: "Blockchain Credit = Adult Financial Access",
-            description: "Understand how blockchain builds your financial future",
-            icon: "link.circle.fill",
-            xpReward: 125,
-            requiredLevel: 4,
-            content: [
-                "Your blockchain credit history follows you to any bank or financial institution - no more starting from zero!",
-                "Every smart purchase decision is permanently recorded, creating unbreakable proof of your financial responsibility.",
-                "Traditional credit cards require income verification. Your ClearSpend history can bypass these requirements.",
-                "Your Credit Score NFT is portable proof of responsible spending - banks will compete for customers like you!",
-                "Amazing! You now understand how blockchain technology will give you a massive advantage in adult financial life."
-            ]
-        )
-    ]
-}
