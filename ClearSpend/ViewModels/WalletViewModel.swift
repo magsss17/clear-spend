@@ -20,7 +20,11 @@ class WalletViewModel: ObservableObject {
         String(format: "%.2f", asaBalance)
     }
     
-    var formattedAlgoBalance: String {
+    var formattedBalanceWithDollar: String {
+        "$" + String(format: "%.2f", asaBalance)
+    }
+    
+    var formattedUsdcBalance: String {
         String(format: "%.3f", algoBalance)
     }
     
@@ -119,7 +123,7 @@ class WalletViewModel: ObservableObject {
                 id: UUID().uuidString,
                 merchant: "Khan Academy",
                 category: "Education",
-                amount: 15.99,
+                amount: 2.00,
                 date: Date().addingTimeInterval(-3600),
                 status: .approved,
                 transactionHash: "DEMO" + UUID().uuidString.prefix(10),
@@ -137,7 +141,7 @@ class WalletViewModel: ObservableObject {
                 id: UUID().uuidString,
                 merchant: "Community Charity",
                 category: "Charity",
-                amount: 25.00,
+                amount: 2.00,
                 date: Date().addingTimeInterval(-7200),
                 status: .approved,
                 transactionHash: "DEMO" + UUID().uuidString.prefix(10),
@@ -154,7 +158,7 @@ class WalletViewModel: ObservableObject {
                 id: UUID().uuidString,
                 merchant: "Amazon",
                 category: "Shopping", 
-                amount: 24.99,
+                amount: 2.00,
                 date: Date().addingTimeInterval(-14400),
                 status: .approved,
                 transactionHash: "DEMO" + UUID().uuidString.prefix(10),
@@ -171,7 +175,7 @@ class WalletViewModel: ObservableObject {
                 id: UUID().uuidString,
                 merchant: "Steam",
                 category: "Gaming",
-                amount: 59.99,
+                amount: 2.00,
                 date: Date().addingTimeInterval(-21600),
                 status: .rejected,
                 transactionHash: nil,
@@ -188,7 +192,7 @@ class WalletViewModel: ObservableObject {
                 id: UUID().uuidString,
                 merchant: "ShadyDealsOnline",
                 category: "Shopping",
-                amount: 89.99,
+                amount: 2.00,
                 date: Date().addingTimeInterval(-28800),
                 status: .rejected,
                 transactionHash: nil,

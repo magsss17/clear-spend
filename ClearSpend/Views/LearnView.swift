@@ -17,6 +17,10 @@ struct LearnView: View {
                     
                     financialEducationModules
                     
+                    daoEducationSection
+                    
+                    yieldEducationSection
+                    
                     // fraudPreventionEducation
                     
                     // achievementSection
@@ -69,7 +73,7 @@ struct LearnView: View {
                 Spacer()
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("$179.97")
+                    Text("$6.00")
                         .font(.title)
                         .fontWeight(.bold)
                         .foregroundColor(.green)
@@ -118,7 +122,7 @@ struct LearnView: View {
             
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
-                    Text("Progress to +$25 Weekly Increase")
+                    Text("Progress to +$2 Weekly Increase")
                         .font(.caption)
                         .foregroundColor(.gray)
                     
@@ -279,6 +283,55 @@ struct LearnView: View {
                 .background(Color.purple)
                 .foregroundColor(.white)
                 .cornerRadius(12)
+            }
+        }
+    }
+    
+    private var daoEducationSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Decentralized Organizations (DAOs)")
+                .font(.headline)
+            
+            Text("Learn about the future of community governance and decision making")
+                .font(.caption)
+                .foregroundColor(.gray)
+            
+            VStack(spacing: 12) {
+                InfoCard(
+                    title: "What is a DAO?",
+                    description: "Decentralized Autonomous Organizations let communities make decisions together without traditional management. Members vote on proposals using digital tokens.",
+                    icon: "person.3.fill",
+                    color: .blue
+                )
+                
+            }
+        }
+    }
+    
+    private var yieldEducationSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Onchain Yield Opportunities")
+                .font(.headline)
+            
+            Text("Discover how to earn passive income through decentralized finance")
+                .font(.caption)
+                .foregroundColor(.gray)
+            
+            VStack(spacing: 12) {
+                InfoCard(
+                    title: "Staking Rewards",
+                    description: "Lock up your digital assets to help secure networks and earn steady rewards. Think of it like earning interest on your savings.",
+                    icon: "lock.shield.fill",
+                    color: .green
+                )
+                
+                InfoCard(
+                    title: "Liquidity Providing",
+                    description: "Provide funds to decentralized exchanges and earn fees from traders. You become part of the financial infrastructure.",
+                    icon: "arrow.triangle.2.circlepath",
+                    color: .purple
+                )
+                
             }
         }
     }
@@ -481,8 +534,8 @@ struct LearningModule: Identifiable {
     static let creditFocusedModules = [
         LearningModule(
             id: "budgeting_basics",
-            title: "Smart Budgeting = Higher Allowances",
-            description: "Learn budgeting to unlock +$10 weekly increases",
+            title: "Smart Budgeting = Higher Allowances", 
+            description: "Learn budgeting to unlock +$2 weekly increases",
             icon: "chart.pie.fill",
             xpReward: 50,
             requiredLevel: 1,
@@ -490,14 +543,14 @@ struct LearningModule: Identifiable {
                 "Smart budgeting shows parents you're responsible with money - leading to higher allowances and credit limits!",
                 "The 50/30/20 rule: 50% for needs, 30% for wants, 20% for savings. Following this can unlock bonus allowances.",
                 "Track your spending to show parents exactly where your money goes - transparency builds trust.",
-                "Congratulations! You've mastered budgeting basics. Your responsible planning has earned you +$10 weekly allowance increase!"
+                "Congratulations! You've mastered budgeting basics. Your responsible planning has earned you +$2 weekly allowance increase!"
             ]
         ),
         
         LearningModule(
             id: "smart_spending",
             title: "Fraud Avoidance = Credit Boost",
-            description: "Learn to spot scams and earn +$15 credit increases",
+            description: "Learn to spot scams and earn +$2 credit increases",
             icon: "shield.fill",
             xpReward: 75,
             requiredLevel: 2,
@@ -505,20 +558,20 @@ struct LearningModule: Identifiable {
                 "Avoiding fraudulent merchants shows excellent judgment - parents reward this with higher credit limits!",
                 "Red flags: Deals that seem too good to be true, unfamiliar websites, urgent purchase pressure.",
                 "Always verify merchant legitimacy before purchasing. ClearSpend's attestation network helps protect you.",
-                "Smart fraud avoidance has unlocked +$15 credit limit increase and shows you're ready for more financial responsibility!"
+                "Smart fraud avoidance has unlocked +$2 credit limit increase and shows you're ready for more financial responsibility!"
             ]
         ),
         
         LearningModule(
             id: "saving_strategies",
             title: "Saving Goals = Allowance Multipliers",
-            description: "Hit savings targets to unlock 2x weekly allowances",
+            description: "Hit savings targets to unlock 2x weekly $2 allowances",
             icon: "target",
             xpReward: 100,
             requiredLevel: 3,
             content: [
                 "Parents love seeing teens save money! Reaching savings goals can unlock 2x weekly allowance multipliers.",
-                "Start with small goals: Save $25 this month to unlock bonus allowances next month.",
+                "Start with small goals: Save $2 this month to unlock bonus allowances next month.",
                 "Set specific targets: Phone upgrade fund, college savings, emergency buffer - each goal shows maturity.",
                 "Automate savings to show consistency. Parents reward reliability with increased financial freedom.",
                 "Congratulations! Your smart saving habits have earned you 2x allowance multipliers and shown true financial maturity!"

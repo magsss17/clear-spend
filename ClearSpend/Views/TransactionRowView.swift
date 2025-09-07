@@ -38,19 +38,13 @@ struct TransactionRowView: View {
                     .font(.subheadline)
                     .fontWeight(.medium)
                 
-                HStack(spacing: 4) {
-                    Text(transaction.category)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    
-                    Text("•")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    
-                    Text(transaction.formattedDate)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
+                Text(transaction.category)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                
+                Text(transaction.formattedDate)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
             }
             
             Spacer()

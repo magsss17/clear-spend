@@ -22,13 +22,12 @@ struct Transaction: Identifiable, Codable {
     }
     
     var formattedAmount: String {
-        String(format: "%.2f ALGO", amount)
+        String(format: "$%.2f", amount)
     }
     
     var formattedDate: String {
         let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .short
+        formatter.dateFormat = "MM/dd/yyyy - h:mm a"
         return formatter.string(from: date)
     }
     

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct InvestView: View {
     @EnvironmentObject var walletViewModel: WalletViewModel
+    @EnvironmentObject var algorandService: AlgorandService
     @State private var selectedInvestmentType = "Savings"
     let investmentTypes = ["Savings", "Stocks", "Crypto", "Education Fund"]
     
@@ -12,8 +13,6 @@ struct InvestView: View {
                     portfolioOverview
                     
                     investmentOptions
-                    
-                    learningResources
                 }
                 .padding()
             }
@@ -29,7 +28,7 @@ struct InvestView: View {
             HStack(spacing: 16) {
                 PortfolioCard(
                     title: "Balance",
-                    amount: "\(walletViewModel.formattedBalance) ALGO",
+                    amount: "\(walletViewModel.formattedBalanceWithDollar)",
                     percentage: "+5.2%",
                     icon: "banknote",
                     color: .green
@@ -37,7 +36,7 @@ struct InvestView: View {
                 
                 PortfolioCard(
                     title: "Profits",
-                    amount: "100 ALGO",
+                    amount: "$100.00",
                     percentage: "30 days",
                     icon: "chart.line.uptrend.xyaxis",
                     color: .blue
@@ -63,36 +62,6 @@ struct InvestView: View {
         }
     }
     
-    private var learningResources: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Learn More")
-                .font(.headline)
-            
-            HStack {
-                Image(systemName: "book.circle.fill")
-                    .font(.largeTitle)
-                    .foregroundColor(.purple)
-                
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Investment Basics")
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                    
-                    Text("Start your investment journey")
-                        .font(.caption)
-                        .foregroundColor(.gray)
-                }
-                
-                Spacer()
-                
-                Image(systemName: "chevron.right")
-                    .foregroundColor(.gray)
-            }
-            .padding()
-            .background(Color.purple.opacity(0.05))
-            .cornerRadius(12)
-        }
-    }
     
     private func getDescription(for option: String) -> String {
         switch option {
@@ -175,6 +144,8 @@ struct InvestmentOptionCard: View {
     let risk: String
     let learnURL: String
     @EnvironmentObject var walletViewModel: WalletViewModel
+    @EnvironmentObject var algorandService: AlgorandService
+    @State private var isInvesting = false
     
     var riskColor: Color {
         switch risk {
@@ -233,17 +204,29 @@ struct InvestmentOptionCard: View {
                     .foregroundColor(.white)
                     .cornerRadius(20)
                     
-                    Button("Invest") {
-                        // Subtract $25 from balance
-                        walletViewModel.subtractFromBalance(25.0)
+                    Button(isInvesting ? "Investing..." : "Invest") {
+                        Task {
+                            isInvesting = true
+                            let result = await algorandService.processInvestment(amount: 2.0, investmentType: title)
+                            await MainActor.run {
+                                if result.success {
+                                    // Refresh balance after successful investment
+                                    Task {
+                                        await walletViewModel.refreshBalance()
+                                    }
+                                }
+                                isInvesting = false
+                            }
+                        }
                     }
                     .font(.caption)
                     .fontWeight(.medium)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
-                    .background(Color.purple)
+                    .background(isInvesting ? Color.gray : Color.purple)
                     .foregroundColor(.white)
                     .cornerRadius(20)
+                    .disabled(isInvesting)
                 }
             }
         }
@@ -256,4 +239,5 @@ struct InvestmentOptionCard: View {
 #Preview {
     InvestView()
         .environmentObject(WalletViewModel())
+        .environmentObject(AlgorandService())
 }

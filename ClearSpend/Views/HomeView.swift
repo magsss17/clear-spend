@@ -19,7 +19,7 @@ struct HomeView: View {
                     
                     recentTransactionsSection
                     
-                    quickActionsSection
+                    //quickActionsSection
                 }
                 .padding()
             }
@@ -45,21 +45,34 @@ struct HomeView: View {
     }
     
     private var balanceCard: some View {
-        VStack(spacing: 8) {
-            Text("Your Balance")
-                .font(.caption)
-                .foregroundColor(.gray)
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Text("Available to Spend")
+                    .font(.headline)
+                    .foregroundColor(.gray)
+                
+                Spacer()
+                
+                HStack(spacing: 6) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(.blue)
+                        .font(.caption)
+                    Text("Fraud Protection Active")
+                        .font(.caption)
+                        .foregroundColor(.blue)
+                }
+            }
             
-            Text("\(walletViewModel.formattedBalance) ALGO")
-                .font(.title)
-                .fontWeight(.bold)
-                .foregroundColor(.purple)
+            HStack(alignment: .bottom, spacing: 8) {
+                Text("\(walletViewModel.formattedBalanceWithDollar)")
+                    .font(.system(size: 42, weight: .bold, design: .rounded))
+            }
         }
         .frame(maxWidth: .infinity)
         .padding()
         .background(Color.white)
-        .cornerRadius(12)
-        .shadow(color: .black.opacity(0.05), radius: 6, x: 0, y: 2)
+        .cornerRadius(16)
+        .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
     }
     
     private var recentTransactionsSection: some View {
@@ -103,51 +116,18 @@ struct HomeView: View {
         .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 1)
     }
     
-    private var quickActionsSection: some View {
-        HStack(spacing: 16) {
-            QuickActionButton(
-                title: "Request",
-                icon: "arrow.down.circle.fill",
-                color: .green
-            ) {
-                // Request allowance action
-            }
-            
-            QuickActionButton(
-                title: "Save",
-                icon: "lock.fill",
-                color: .blue
-            ) {
-                // Save with timelock action
-            }
-            
-            QuickActionButton(
-                title: "Goals",
-                icon: "target",
-                color: .orange
-            ) {
-                // View savings goals
-            }
-        }
-    }
+
     
     private var creditScoreSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
-                Text("Your Balance")
+                Text("Your Credit Score")
                     .font(.headline)
+                    .foregroundColor(.secondary)
                 
                 Spacer()
                 
-                Button(action: {
-                    if let url = URL(string: "https://testnet.algoexplorer.io/asset/745477123") {
-                        UIApplication.shared.open(url)
-                    }
-                }) {
-                    Text("View NFT")
-                        .font(.caption)
-                        .foregroundColor(.purple)
-                }
+                // Button disabled - View NFT functionality removed
             }
             
             HStack {
@@ -160,7 +140,7 @@ struct HomeView: View {
                         .font(.subheadline)
                         .foregroundColor(.green)
                     
-                    Text("Built from 23 verified purchases")
+                    Text("Built from 23 verified $2 purchases")
                         .font(.caption)
                         .foregroundColor(.gray)
                 }

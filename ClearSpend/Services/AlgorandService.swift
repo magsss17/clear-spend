@@ -6,7 +6,7 @@ class AlgorandService: ObservableObject {
     @Published var isConnected = false
     @Published var currentAddress: String?
     @Published var balance: Double = 0
-    @Published var asaBalance: Double = 150.0 // ClearSpend Dollar balance for main branch compatibility
+    @Published var asaBalance: Double = 150.0 // USDC balance for frontend display
     
     private let testnetURL = "https://testnet-api.algonode.cloud"
     private let testnetIndexer = "https://testnet-idx.algonode.cloud"
@@ -14,8 +14,12 @@ class AlgorandService: ObservableObject {
     // Backend API configuration
     private let backendURL = "http://localhost:8000"
     
+    // Testnet wallet addresses
+    static let testWallet1Address = "NS7NZGL6NBTP57VPBRR3KRAGSXZAHIHE2MRMMUWYMBOMI5JOM7FBMTADQE"
+    static let testWallet2Address = "HPD6QQAV2KJ2YXY6AOGEBSXJEI7IS4GQNMOQRBOXXR7KYXWOEUZRWB6IWE"
+    
     // Demo wallet for hackathon
-    private let demoAddress = "DEMO7XQVZQHGZPWXZQHGZQVZQHGZPWXZQHGZQVZQHGZPWXZQHGZQVZQHGZ"
+    private let demoAddress = testWallet1Address
     private let demoMnemonic = "demo seed phrase for hackathon testing only do not use in production"
     
     init() {
@@ -23,20 +27,42 @@ class AlgorandService: ObservableObject {
     }
     
     private func setupDemoWallet() {
-        // For hackathon demo - using mock data
+        // For hackathon demo - using testnet wallet 1
         currentAddress = demoAddress
-        balance = 150.0 // Demo balance in ALGO
-        asaBalance = 150.0 // ClearSpend Dollar balance
+        balance = 150.0 // Default balance (backend uses ALGO)
+        asaBalance = 150.0 // USDC balance for frontend
         isConnected = true
+        
+        // Fetch real balance on initialization
+        Task {
+            await fetchRealBalance()
+        }
     }
     
     // Main branch compatibility method
     func refreshBalance() async {
-        // Simulate balance refresh
-        try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 second delay
-        // In a real implementation, this would fetch from blockchain
-        asaBalance = 150.0
-        balance = 150.0
+        await fetchRealBalance()
+    }
+    
+    private func fetchRealBalance() async {
+        guard let url = URL(string: "\(testnetURL)/v2/accounts/\(demoAddress)") else {
+            return
+        }
+        
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let amount = json["amount"] as? Int {
+                let usdcBalance = Double(amount) / 1_000_000.0 // Convert microALGO to USDC equivalent
+                balance = usdcBalance
+                asaBalance = usdcBalance
+            }
+        } catch {
+            print("Error fetching balance: \(error)")
+            // Fallback to demo balance
+            balance = 150.0
+            asaBalance = 150.0
+        }
     }
     
     func processPurchase(merchant: String, amount: Double, category: String) async -> PurchaseResult {
@@ -62,7 +88,7 @@ class AlgorandService: ObservableObject {
         
         let requestData: [String: Any] = [
             "merchant_name": merchant,
-            "amount": Int(amount * 1_000_000), // Convert to microALGO
+            "amount": Int(amount * 1_000_000), // Convert USDC to microAlgo for backend
             "user_address": demoAddress
         ]
         
@@ -192,6 +218,48 @@ class AlgorandService: ObservableObject {
         return [:]
     }
     
+    func processInvestment(amount: Double, investmentType: String) async -> PurchaseResult {
+        // For now, simulate a transaction from wallet 1 to wallet 2
+        do {
+            let transactionId = try await sendInvestmentTransaction(amount: amount)
+            
+            // Update local balance
+            balance -= amount
+            asaBalance -= amount
+            
+            return PurchaseResult(
+                success: true,
+                message: "Investment of $\(String(format: "%.2f", amount)) successful!",
+                transactionId: transactionId,
+                explorerLink: "https://testnet.algoexplorer.io/tx/\(transactionId)"
+            )
+        } catch {
+            return PurchaseResult(
+                success: false,
+                message: "Investment failed: \(error.localizedDescription)",
+                transactionId: nil,
+                explorerLink: nil
+            )
+        }
+    }
+    
+    private func sendInvestmentTransaction(amount: Double) async throws -> String {
+        // This would implement the actual transaction logic
+        // For now, we'll create a mock transaction ID and simulate the transaction
+        let mockTransactionId = generateMockTransactionId()
+        
+        // In a real implementation, this would:
+        // 1. Create a transaction from testWallet1Address to testWallet2Address
+        // 2. Sign the transaction with the private key
+        // 3. Submit to the Algorand network
+        // 4. Return the actual transaction ID
+        
+        // Simulate network delay
+        try await Task.sleep(nanoseconds: 2_000_000_000)
+        
+        return mockTransactionId
+    }
+    
     private func generateMockTransactionId() -> String {
         let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
         return String((0..<52).map { _ in letters.randomElement()! })
@@ -204,7 +272,7 @@ class AlgorandService: ObservableObject {
                 id: "1",
                 merchant: "Spotify",
                 category: "Entertainment",
-                amount: 9.99,
+                amount: 2.00,
                 date: Date().addingTimeInterval(-86400),
                 status: .approved,
                 transactionHash: generateMockTransactionId(),
@@ -226,7 +294,7 @@ class AlgorandService: ObservableObject {
                 id: "2",
                 merchant: "Amazon",
                 category: "Shopping",
-                amount: 24.99,
+                amount: 2.00,
                 date: Date().addingTimeInterval(-172800),
                 status: .approved,
                 transactionHash: generateMockTransactionId(),
@@ -248,7 +316,7 @@ class AlgorandService: ObservableObject {
                 id: "3",
                 merchant: "GameStop",
                 category: "Gaming",
-                amount: 59.99,
+                amount: 2.00,
                 date: Date().addingTimeInterval(-259200),
                 status: .rejected,
                 transactionHash: nil,

@@ -4,7 +4,7 @@ struct SpendView: View {
     @EnvironmentObject var algorandService: AlgorandService
     @EnvironmentObject var walletViewModel: WalletViewModel
     @State private var merchantName = ""
-    @State private var amount = ""
+    @State private var amount = "2.00"
     @State private var category = "Shopping"
     @State private var purchaseJustification: PurchaseJustification = .necessity
     @State private var showingPurchaseConfirmation = false
@@ -22,8 +22,6 @@ struct SpendView: View {
                 VStack(spacing: 24) {
                     availableBalanceCard
                     
-                    fraudPreventionStatus
-                    
                     purchaseForm
                     
                     categorySelector
@@ -34,7 +32,7 @@ struct SpendView: View {
                     
                     merchantSuggestions
                     
-                    recentBlockedPurchases
+                    // recentBlockedPurchases
                 }
                 .padding()
             }
@@ -50,20 +48,29 @@ struct SpendView: View {
     
     private var availableBalanceCard: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Available to Spend")
-                .font(.headline)
-                .foregroundColor(.gray)
+            HStack {
+                Text("Available to Spend")
+                    .font(.headline)
+                    .foregroundColor(.gray)
+                
+                Spacer()
+                
+                HStack(spacing: 6) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(.blue)
+                        .font(.caption)
+                    Text("Fraud Protection Active")
+                        .font(.caption)
+                        .foregroundColor(.blue)
+                }
+            }
             
             HStack(alignment: .bottom, spacing: 8) {
-                Text("\(walletViewModel.formattedBalance)")
+                Text("\(walletViewModel.formattedBalanceWithDollar)")
                     .font(.system(size: 42, weight: .bold, design: .rounded))
-                
-                Text("ALGO")
-                    .font(.title3)
-                    .foregroundColor(.gray)
-                    .padding(.bottom, 6)
             }
         }
+        .frame(maxWidth: .infinity)
         .padding()
         .background(Color.white)
         .cornerRadius(16)
@@ -85,11 +92,11 @@ struct SpendView: View {
             }
             
             VStack(alignment: .leading, spacing: 8) {
-                Text("Amount (ALGO)")
+                Text("Amount ($)")
                     .font(.caption)
                     .foregroundColor(.gray)
                 
-                TextField("0.00", text: $amount)
+                TextField("2.00", text: $amount)
                     .keyboardType(.decimalPad)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
             }
@@ -360,7 +367,7 @@ struct SpendView: View {
     
     private func clearForm() {
         merchantName = ""
-        amount = ""
+        amount = "2.00"
         category = "Shopping"
     }
     
@@ -408,7 +415,7 @@ struct SpendView: View {
             VStack(spacing: 12) {
                 blockedPurchaseRow(
                     merchant: "ShadyDealsOnline",
-                    amount: "$59.99",
+                    amount: "$2.00",
                     reason: "Unverified merchant",
                     icon: "exclamationmark.triangle.fill",
                     color: .red
@@ -416,7 +423,7 @@ struct SpendView: View {
                 
                 blockedPurchaseRow(
                     merchant: "GameStop",
-                    amount: "$79.99",
+                    amount: "$2.00",
                     reason: "Gaming category blocked",
                     icon: "xmark.circle.fill",
                     color: .orange
@@ -424,7 +431,7 @@ struct SpendView: View {
                 
                 blockedPurchaseRow(
                     merchant: "FakeGameStore",
-                    amount: "$39.99",
+                    amount: "$2.00",
                     reason: "Fraudulent merchant detected",
                     icon: "shield.slash.fill",
                     color: .red
@@ -436,7 +443,7 @@ struct SpendView: View {
                     .font(.subheadline)
                     .fontWeight(.medium)
                 Spacer()
-                Text("$179.97")
+                Text("$6.00")
                     .font(.subheadline)
                     .fontWeight(.bold)
                     .foregroundColor(.green)
