@@ -147,6 +147,24 @@ class WalletViewModel: ObservableObject {
         recentTransactions = [
             Transaction(
                 id: UUID().uuidString,
+                merchant: "Lofty Real Estate",
+                category: "Investment",
+                amount: 25.00,
+                date: Date().addingTimeInterval(-1800),
+                status: .approved,
+                transactionHash: "PXUHIF3M7AA6ONMTBNRMATVEFWTFGQMHDKYRMAD5GI2GZLZJ62QQ",
+                note: "Real estate investment",
+                purchaseJustification: .investment,
+                merchantReputationScore: 9.5,
+                spendingIntegrityScore: 9.8,
+                verificationProofs: [
+                    VerificationProof(type: .merchantReputation, result: .passed, details: "Verified investment platform (9.5/10)", timestamp: Date(), blockchainHash: "0xINV123"),
+                    VerificationProof(type: .categoryRestriction, result: .passed, details: "Investment purchases build wealth", timestamp: Date(), blockchainHash: "0xINV456"),
+                    VerificationProof(type: .spendingLimit, result: .passed, details: "Smart investment decision", timestamp: Date(), blockchainHash: nil)
+                ]
+            ),
+            Transaction(
+                id: UUID().uuidString,
                 merchant: "Khan Academy",
                 category: "Education",
                 amount: 5.00,

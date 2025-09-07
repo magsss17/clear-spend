@@ -20,6 +20,8 @@ struct TransactionRowView: View {
         case "Education": return "book.fill"
         case "Transportation": return "car.fill"
         case "Gaming": return "gamecontroller.fill"
+        case "Investment": return "chart.line.uptrend.xyaxis"
+        case "Charity": return "heart.fill"
         default: return "tag.fill"
         }
     }
@@ -35,9 +37,9 @@ struct TransactionRowView: View {
             HStack(spacing: 12) {
                 Image(systemName: categoryIcon)
                     .font(.title3)
-                    .foregroundColor(.purple)
+                    .foregroundColor(transaction.category == "Investment" ? .green : .purple)
                     .frame(width: 40, height: 40)
-                    .background(Color.purple.opacity(0.1))
+                    .background((transaction.category == "Investment" ? Color.green : Color.purple).opacity(0.1))
                     .cornerRadius(8)
                 
                 VStack(alignment: .leading, spacing: 4) {

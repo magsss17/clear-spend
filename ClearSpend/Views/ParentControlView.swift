@@ -49,7 +49,7 @@ struct ParentControlView: View {
                         .font(.headline)
                         .foregroundColor(.gray)
                     
-                    Text("\(walletViewModel.formattedBalance) ALGO")
+                    Text("\(walletViewModel.formattedBalance) USD")
                         .font(.system(size: 28, weight: .bold, design: .rounded))
                 }
                 
