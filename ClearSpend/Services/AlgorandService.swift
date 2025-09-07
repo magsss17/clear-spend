@@ -338,9 +338,6 @@ class AlgorandService: ObservableObject {
             // Step 4: Wait for confirmation
             try await waitForConfirmation(txId: txId)
             
-            // Update local balance
-            asaBalance -= amount
-            
             // Add to transaction history
             let transaction = TransactionResult(
                 id: txId,
@@ -353,13 +350,18 @@ class AlgorandService: ObservableObject {
             transactions.insert(transaction, at: 0)
             
             print("✅ ATOMIC TRANSFER SUCCESS - Transaction Group: \(txId)")
-            print("🔗 Explorer: https://testnet.algoexplorer.io/tx/\(txId)")
+            print("🔗 Explorer: https://lora.algokit.io/testnet/transaction/\(txId)")
+            
+            // Update local balance after successful transaction
+            await MainActor.run {
+                asaBalance = max(0, asaBalance - amount)
+            }
             
             return PurchaseResult(
                 success: true,
                 message: "✅ Purchase verified & approved!\n🔗 Atomic transfer confirmed on Algorand testnet\n🛡️ Fraud prevention: PASSED\n🎓 Smart spending decision increases your credit score!",
                 transactionId: txId,
-                explorerLink: "https://testnet.algoexplorer.io/tx/\(txId)"
+                explorerLink: "https://lora.algokit.io/testnet/transaction/\(txId)"
             )
             
         } catch {
@@ -424,6 +426,7 @@ class AlgorandService: ObservableObject {
         
         // Merchant reputation verification
         let merchantRep = getMerchantReputation(merchant: merchant)
+        print("   🏪 Merchant reputation: \(String(format: "%.1f", merchantRep))/10.0")
         if merchantRep < 6.0 {
             print("   ❌ BLOCKED: Low merchant reputation (\(String(format: "%.1f", merchantRep)))")
             return false
@@ -535,7 +538,15 @@ class AlgorandService: ObservableObject {
             "Local Food Mart": 7.2,
             "ShadyDealsOnline": 1.2,
             "FakeGameStore": 0.8,
-            "UnverifiedShop": 2.1
+            "UnverifiedShop": 2.1,
+            // Investment merchants - trusted platforms
+            "Real Estate (Lofty)": 9.5,
+            "Lofty Real Estate": 9.5,
+            "xAlgo": 9.3,
+            "Valar": 9.1,
+            "Index Fund": 8.8,
+            "Stock Market": 8.5,
+            "Crypto Exchange": 7.8
         ]
         
         return merchantReputations[merchant] ?? 5.0 // Default neutral score

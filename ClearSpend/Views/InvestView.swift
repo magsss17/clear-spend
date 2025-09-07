@@ -210,6 +210,8 @@ struct InvestmentOptionCard: View {
                             let result = await algorandService.processPurchase(merchant: title, amount: 2.0, category: "Investment")
                             await MainActor.run {
                                 if result.success {
+                                    // Add transaction to wallet view model
+                                    walletViewModel.addTransaction(result, merchant: title, category: "Investment", amount: 2.0)
                                     // Refresh balance after successful investment
                                     Task {
                                         await walletViewModel.refreshBalance()

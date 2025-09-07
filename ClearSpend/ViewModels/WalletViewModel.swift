@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 class WalletViewModel: ObservableObject {
-    @Published var asaBalance: Double = 1000.0 // ClearSpend Dollar balance - reflects real testnet wallet balance
+    @Published var asaBalance: Double = 150.0 // ClearSpend Dollar balance - starts with initial balance, syncs from testnet wallet
     @Published var algoBalance: Double = 0.0 // ALGO balance for network fees
     @Published var weeklyAllowance: Double = 50.0
     @Published var recentTransactions: [Transaction] = []
@@ -90,9 +90,11 @@ class WalletViewModel: ObservableObject {
         
         // Observe balance changes from AlgorandService
         service.$asaBalance
+            .receive(on: DispatchQueue.main)
             .assign(to: &$asaBalance)
         
         service.$balance
+            .receive(on: DispatchQueue.main)
             .assign(to: &$algoBalance)
     }
     
