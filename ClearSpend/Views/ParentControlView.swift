@@ -18,6 +18,17 @@ struct ParentControlView: View {
     
     let categories = ["Shopping", "Food", "Entertainment", "Education", "Transportation", "Gaming", "Investment", "Charity"]
     
+    // Hardcoded check for Ellis's iPhone
+    private var isEllisDevice: Bool {
+        let deviceName = UIDevice.current.name
+        return deviceName.lowercased().contains("ellis")
+    }
+    
+    // Text color based on device
+    private var primaryTextColor: Color {
+        return isEllisDevice ? .black : .primary
+    }
+    
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -57,6 +68,7 @@ struct ParentControlView: View {
                     
                     Text("$\(walletViewModel.formattedBalance)")
                         .font(.system(size: 28, weight: .bold, design: .rounded))
+                        .foregroundColor(primaryTextColor)
                 }
                 
                 Spacer()
@@ -69,6 +81,7 @@ struct ParentControlView: View {
                     Text("$\(allowanceAmount)")
                         .font(.title3)
                         .fontWeight(.semibold)
+                        .foregroundColor(primaryTextColor)
                 }
             }
             
@@ -98,6 +111,7 @@ struct ParentControlView: View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Quick Controls")
                 .font(.headline)
+                .foregroundColor(primaryTextColor)
             
             HStack(spacing: 16) {
                 Button(action: {
@@ -149,10 +163,12 @@ struct ParentControlView: View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Spending Restrictions")
                 .font(.headline)
+                .foregroundColor(primaryTextColor)
             
             VStack(spacing: 12) {
                 HStack {
                     Text("Daily Limit")
+                        .foregroundColor(primaryTextColor)
                     Spacer()
                     TextField("0.00", text: $dailyLimit)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -168,6 +184,7 @@ struct ParentControlView: View {
                         Text("Blocked Categories")
                             .font(.subheadline)
                             .fontWeight(.medium)
+                            .foregroundColor(primaryTextColor)
                         Spacer()
                         Button(action: { showingAddCategory = true }) {
                             Image(systemName: "plus.circle.fill")
@@ -180,6 +197,7 @@ struct ParentControlView: View {
                             Image(systemName: "xmark.circle.fill")
                                 .foregroundColor(.red)
                             Text(category)
+                                .foregroundColor(primaryTextColor)
                             Spacer()
                             Button("Remove") {
                                 merchantManager.removeRestrictedCategory(category)
@@ -210,6 +228,7 @@ struct ParentControlView: View {
             HStack {
                 Text("Approved Merchants")
                     .font(.headline)
+                    .foregroundColor(primaryTextColor)
                 
                 Spacer()
                 
@@ -231,6 +250,7 @@ struct ParentControlView: View {
                             .font(.subheadline)
                             .fontWeight(.medium)
                             .strikethrough(!merchant.isActive)
+                            .foregroundColor(primaryTextColor)
                         Text(merchant.category)
                             .font(.caption)
                             .foregroundColor(.gray)
@@ -276,6 +296,7 @@ struct ParentControlView: View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Recent Activity")
                 .font(.headline)
+                .foregroundColor(primaryTextColor)
             
             ForEach(walletViewModel.recentTransactions.prefix(3), id: \.id) { transaction in
                 HStack {
@@ -287,6 +308,7 @@ struct ParentControlView: View {
                         Text(transaction.merchant)
                             .font(.subheadline)
                             .fontWeight(.medium)
+                            .foregroundColor(primaryTextColor)
                         Text(transaction.category)
                             .font(.caption)
                             .foregroundColor(.gray)
@@ -298,6 +320,7 @@ struct ParentControlView: View {
                         Text("$\(transaction.amount, specifier: "%.2f")")
                             .font(.subheadline)
                             .fontWeight(.medium)
+                            .foregroundColor(primaryTextColor)
                         
                         Text(transaction.status == .approved ? "Approved" : "Blocked")
                             .font(.caption)
@@ -320,7 +343,8 @@ struct ParentControlView: View {
                     
                     Picker("Category", selection: $newMerchantCategory) {
                         ForEach(categories, id: \.self) { category in
-                            Text(category).tag(category)
+                            Text(category)
+                                .foregroundColor(primaryTextColor).tag(category)
                         }
                     }
                 }

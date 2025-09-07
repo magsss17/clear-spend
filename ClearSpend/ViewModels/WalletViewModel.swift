@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 class WalletViewModel: ObservableObject {
-    @Published var asaBalance: Double = 150.0 // ClearSpend Dollar balance - starts with initial balance, syncs from testnet wallet
+    @Published var asaBalance: Double = 1.78 // ClearSpend Dollar balance - starts with realistic balance, syncs from testnet wallet
     @Published var algoBalance: Double = 0.0 // ALGO balance for network fees
     @Published var weeklyAllowance: Double = 50.0
     @Published var recentTransactions: [Transaction] = []
@@ -172,7 +172,7 @@ class WalletViewModel: ObservableObject {
                 amount: 5.00,
                 date: Date().addingTimeInterval(-3600),
                 status: .approved,
-                transactionHash: "RS7DE6PVJQKJCFOT3GRKWUUPCZLFA7U5Z463XAHPV45BNY7WUHLQ",
+                transactionHash: "R4S437SWZTH2TGHJAFMKFIDOY4UJKPGJPNSO2OCV22GWSG4NTODA",
                 note: "Premium subscription",
                 purchaseJustification: .education,
                 merchantReputationScore: 9.8,

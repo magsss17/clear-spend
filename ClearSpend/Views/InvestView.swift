@@ -207,7 +207,7 @@ struct InvestmentOptionCard: View {
                     Button(isInvesting ? "Investing..." : "Invest") {
                         Task {
                             isInvesting = true
-                            let result = await algorandService.processPurchase(merchant: title, amount: 2.0, category: "Investment")
+                            let result = await algorandService.processInvestment(amount: 2.0, investmentType: title)
                             await MainActor.run {
                                 if result.success {
                                     // Add transaction to wallet view model

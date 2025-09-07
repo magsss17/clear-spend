@@ -188,14 +188,8 @@ class BlockchainService:
     def deploy_attestation_oracle(self, deployer_private_key: str) -> Optional[int]:
         """Deploy the attestation oracle smart contract"""
         try:
-            # This would use AlgoKit's deployment tools in production
-            # For now, we'll simulate deployment
+
             logger.info("Deploying Attestation Oracle contract...")
-            
-            # In a real implementation, this would:
-            # 1. Compile the contract using AlgoKit
-            # 2. Deploy to the network
-            # 3. Return the app ID
             
             # Simulate deployment for demo
             self.attestation_oracle_app_id = 12345  # Mock app ID

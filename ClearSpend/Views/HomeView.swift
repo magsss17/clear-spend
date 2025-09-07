@@ -73,6 +73,30 @@ struct HomeView: View {
                         .font(.system(size: 42, weight: .bold, design: .rounded))
                 }
             }
+            
+            if let address = algorandService.currentAddress {
+                HStack {
+                    Image(systemName: "link.circle.fill")
+                        .font(.caption2)
+                        .foregroundColor(.purple.opacity(0.7))
+                    Text(String(address.prefix(8)) + "..." + String(address.suffix(6)))
+                        .font(.caption2)
+                        .foregroundColor(.purple.opacity(0.7))
+                        .monospaced()
+                    Spacer()
+                    Button(action: {
+                        Task {
+                            await algorandService.refreshBalance()
+                            await walletViewModel.refreshBalance()
+                        }
+                    }) {
+                        Image(systemName: "arrow.clockwise")
+                            .font(.caption)
+                            .foregroundColor(.blue)
+                    }
+                }
+                .padding(.top, 4)
+            }
         }
         .frame(maxWidth: .infinity)
         .padding()
