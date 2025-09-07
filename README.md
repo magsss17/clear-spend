@@ -1,7 +1,5 @@
 # ClearSpend - Teen Financial Literacy on Algorand
 
-## Algorand x EasyA Harvard Hackathon Submission
-
 **Description:** Teen spending made safe: verified purchases, lifelong money habits, and financial literacy app.
 
 ## Demo Video
@@ -70,7 +68,7 @@ ClearSpend leverages **Algorand's unique blockchain features** to create a trust
 
 ---
 
-## Custom Smart Contracts (Requirement #7)
+## Custom Smart Contracts
 
 ### 1. Attestation Oracle Contract (`backend/contracts/attestation_oracle.py`)
 
@@ -307,60 +305,19 @@ open ClearSpend.xcodeproj
 
 ---
 
-## Why ClearSpend Wins This Hackathon
+## Key Features & Innovation
 
-### Requirement Compliance
-
-1. **Built with Smart Contracts on Algorand**
-   - Two custom smart contracts with unique functionality
-   - Real TestNet deployment and transactions
-   - Innovative use of atomic transfers and box storage
-
-2. **Open Source & Available**
-   - Complete codebase on GitHub
-   - MIT License for community use
-   - Comprehensive documentation
-
-3. **Short Summary (<150 chars)**
-   - "Blockchain-powered teen spending app with smart contract-verified purchases, parental controls, and financial education on Algorand."
-
-4. **Full Description**
-   - Solves real teen financial literacy problem
-   - Leverages Algorand's unique features (atomic transfers, box storage, low fees)
-   - Creates verifiable spending history for credit building
-
-5. **Technical Description**
-   - AlgoKit, AlgoPy, Algorand SDK integration
-   - Atomic transfers enable trustless verification impossible on other chains
-   - Box storage provides scalable on-chain merchant attestations
-
-6. **Canva Presentation**
-   - Professional slides covering team, problem, solution, technical details
-   - Link: [Canva Presentation](https://canva.com/YOUR_LINK)
-
-7. **Custom Smart Contracts**
-   - Attestation Oracle: Box storage + atomic verification
-   - Allowance Manager: Timelock savings + parental controls
-   - Both fully functional with live TestNet deployment
-
-8. **Clear README with Videos**
-   - Demo video showing real functionality
-   - Technical explanation with audio walkthrough
-   - Screenshots and comprehensive documentation
-
-### Innovation Beyond Requirements
-
-#### Technical Innovation
+### Technical Innovation
 - **First teen finance app** with pre-purchase blockchain verification
 - **Novel atomic transfer usage** for parental controls
 - **Box storage optimization** for scalable merchant attestations
 
-#### Real-World Impact
-- Addresses $1.4 trillion teen spending market
+### Real-World Impact
+- Addresses teen financial literacy challenges
 - Builds financial literacy from young age
 - Creates verifiable credit history on blockchain
 
-#### Production Readiness
+### Production Readiness
 - Complete full-stack implementation
 - Docker deployment ready
 - Comprehensive testing suite
@@ -422,7 +379,5 @@ copies or substantial portions of the Software.
 - Cross-chain reputation system
 
 ---
-
-**Built at Algorand x EasyA Harvard Hackathon 2025**
 
 *ClearSpend: Where blockchain meets financial education*
