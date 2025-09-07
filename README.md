@@ -84,20 +84,25 @@ clear-spend/
 │   ├── tests/                 # Comprehensive testing
 │   ├── deployment/            # Docker & deployment configs
 │   └── main.py                # FastAPI application
-├── ios-app/                   # iOS SwiftUI app
-│   └── ClearSpendApp/         # Xcode project
-│       ├── Views/             # SwiftUI views
-│       ├── Models/            # Data models
-│       ├── Services/          # Algorand integration
-│       ├── ViewModels/        # Business logic
-│       └── Resources/         # Assets and resources
+├── ClearSpend/                # iOS SwiftUI app source code
+│   ├── Views/                 # SwiftUI views
+│   ├── Models/                # Data models
+│   ├── Services/              # Algorand integration
+│   ├── ViewModels/            # Business logic
+│   └── Assets.xcassets/       # App assets and resources
+├── ClearSpend.xcodeproj/      # Xcode project file
 ├── docs/                      # Documentation
 │   ├── ARCHITECTURE.md        # System architecture
 │   ├── API.md                 # API documentation
 │   └── config.env.example     # Environment template
 ├── scripts/                   # Utility scripts
 │   ├── setup.sh              # Project setup script
-│   └── start_backend.py      # Backend startup script
+│   ├── start_backend.py      # Backend startup script
+│   ├── test_integration.py   # Integration tests
+│   ├── demo_backend_integration.py # Demo script
+│   └── utilities/            # Utility scripts
+│       ├── create_clearspend_asa.py
+│       └── generate_testnet_wallet.py
 ├── tools/                     # Development tools
 ├── Makefile                   # Build automation
 ├── .gitignore                 # Git ignore rules
