@@ -178,7 +178,7 @@ make clean        # Clean temporary files
 5. **Execute Transactions** → Atomic transfer groups for secure purchases
 
 ### iOS App Flow
-1. **Teen opens app** → Sees 150 ALGO allowance
+1. **Teen opens app** → Sees $1000 allowance (10 ALGO at $100/ALGO rate)
 2. **Initiates purchase** → Selects merchant and amount
 3. **API Verification** → Backend verifies purchase via atomic transfers
 4. **Approved purchases** → Instant confirmation with explorer link

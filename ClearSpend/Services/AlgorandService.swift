@@ -32,7 +32,7 @@ class AlgorandService: ObservableObject {
     @Published var isConnected = false
     @Published var currentAddress: String?
     @Published var balance: Double = 0 // ALGO balance (actual blockchain balance)
-    @Published var asaBalance: Double = 150.0 // USD balance for frontend display (1 ALGO = $100)
+    @Published var asaBalance: Double = 1000.0 // USD balance for frontend display (1 ALGO = $100)
     @Published var isLoadingBalance = false
     
     private let testnetURL = "https://testnet-api.algonode.cloud"
@@ -72,8 +72,8 @@ class AlgorandService: ObservableObject {
     private func setupDemoWallet() {
         // For hackathon demo - using testnet wallet 1
         currentAddress = demoAddress
-        balance = 1.5 // Default balance: 1.5 ALGO = $150 (1 ALGO = $100)
-        asaBalance = 150.0 // USD balance for frontend display
+        balance = 10.0 // Default balance: 10 ALGO = $1000 (1 ALGO = $100)
+        asaBalance = 1000.0 // USD balance for frontend display
         isConnected = true
         
         // Fetch real balance on initialization
@@ -107,8 +107,8 @@ class AlgorandService: ObservableObject {
         } catch {
             print("Error fetching balance: \(error)")
             // Fallback to demo balance
-            balance = 1.5 // Fallback: 1.5 ALGO = $150
-            asaBalance = 150.0 // USD display balance
+            balance = 10.0 // Fallback: 10 ALGO = $1000
+            asaBalance = 1000.0 // USD display balance
         }
         
         isLoadingBalance = false

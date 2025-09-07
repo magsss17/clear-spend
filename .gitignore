@@ -86,3 +86,9 @@ iOSInjectionProject/
 
 # macOS
 .DS_Store
+
+# Node modules and JavaScript files (except Swift project JS)
+node_modules/
+*.js
+!ClearSpend/**/*.js
+package-lock.json

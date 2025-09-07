@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 class WalletViewModel: ObservableObject {
-    @Published var asaBalance: Double = 150.0 // ClearSpend Dollar balance
+    @Published var asaBalance: Double = 1000.0 // ClearSpend Dollar balance - reflects real testnet wallet balance
     @Published var algoBalance: Double = 0.0 // ALGO balance for network fees
     @Published var weeklyAllowance: Double = 50.0
     @Published var recentTransactions: [Transaction] = []

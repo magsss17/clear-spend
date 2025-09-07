@@ -1,0 +1,27 @@
+{
+  "name": "clear-spend",
+  "version": "1.0.0",
+  "description": "ClearSpend is a blockchain-powered teen spending app that teaches financial responsibility through verifiable, parent-controlled digital allowances on Algorand.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/magsss17/clear-spend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/magsss17/clear-spend/issues"
+  },
+  "homepage": "https://github.com/magsss17/clear-spend#readme",
+  "dependencies": {
+    "algosdk": "^3.4.0"
+  }
+}
