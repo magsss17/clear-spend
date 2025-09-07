@@ -243,21 +243,31 @@ class AlgorandService: ObservableObject {
     }
     
     private func checkPurchaseApproval(category: String, amount: Double, merchant: String? = nil) -> Bool {
-        // Use MerchantManager for dynamic restrictions
-        let merchantManager = MerchantManager()
+        // For now, use static rules until MerchantManager is properly integrated
+        // In production, this would connect to the parent control system
+        let restrictedCategories = ["Gaming", "Gambling", "Adult Content"]
+        let dailyLimit: Double = 50.0
+        let approvedMerchants = ["Khan Academy", "Amazon", "Spotify", "Community Charity", 
+                                 "Lofty Real Estate", "xAlgo", "Valar"]
         
-        // Check if purchase is allowed by parent restrictions
+        // Check if category is restricted
+        if restrictedCategories.contains(category) {
+            return false
+        }
+        
+        // Check daily limit
+        if amount > dailyLimit {
+            return false
+        }
+        
+        // If merchant is specified, check if it's approved
         if let merchantName = merchant {
-            if !merchantManager.isPurchaseAllowed(merchant: merchantName, category: category, amount: amount) {
-                return false
+            // Investment platforms are always approved
+            if category == "Investment" {
+                return true
             }
-        } else {
-            // Check category and amount only
-            if merchantManager.isCategoryRestricted(category) {
-                return false
-            }
-            
-            if amount > merchantManager.dailyLimit {
+            // Check if merchant is in approved list or if category is not restricted
+            if !approvedMerchants.contains(merchantName) && restrictedCategories.contains(category) {
                 return false
             }
         }
