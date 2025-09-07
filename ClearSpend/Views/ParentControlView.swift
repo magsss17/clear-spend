@@ -55,7 +55,7 @@ struct ParentControlView: View {
                         .font(.headline)
                         .foregroundColor(.gray)
                     
-                    Text("\(walletViewModel.formattedBalance) USD")
+                    Text("$\(walletViewModel.formattedBalance)")
                         .font(.system(size: 28, weight: .bold, design: .rounded))
                 }
                 
@@ -157,7 +157,7 @@ struct ParentControlView: View {
                     TextField("0.00", text: $dailyLimit)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .frame(width: 100)
-                    Text("USD")
+                    Text("$")
                         .foregroundColor(.gray)
                 }
                 
