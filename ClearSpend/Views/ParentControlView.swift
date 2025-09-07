@@ -3,17 +3,20 @@ import SwiftUI
 struct ParentControlView: View {
     @EnvironmentObject var algorandService: AlgorandService
     @EnvironmentObject var walletViewModel: WalletViewModel
+    @StateObject private var merchantManager = MerchantManager()
     
     @State private var selectedRestriction = "Gaming"
     @State private var dailyLimit = "50.00"
     @State private var showingAddMerchant = false
+    @State private var showingAddCategory = false
     @State private var newMerchantName = ""
     @State private var newMerchantCategory = "Shopping"
+    @State private var newRestrictedCategory = ""
     @State private var allowanceAmount = "50.00"
     @State private var isPaused = false
+    @State private var editingMerchant: ApprovedMerchant?
     
-    let categories = ["Shopping", "Food", "Entertainment", "Education", "Transportation", "Gaming"]
-    let restrictedCategories = ["Gaming", "Gambling", "Adult Content"]
+    let categories = ["Shopping", "Food", "Entertainment", "Education", "Transportation", "Gaming", "Investment", "Charity"]
     
     var body: some View {
         NavigationStack {
@@ -36,6 +39,9 @@ struct ParentControlView: View {
             .navigationBarTitleDisplayMode(.large)
             .sheet(isPresented: $showingAddMerchant) {
                 addMerchantSheet
+            }
+            .sheet(isPresented: $showingAddCategory) {
+                addCategorySheet
             }
         }
         .background(Color.white)
@@ -151,30 +157,44 @@ struct ParentControlView: View {
                     TextField("0.00", text: $dailyLimit)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .frame(width: 100)
-                    Text("ALGO")
+                    Text("USD")
                         .foregroundColor(.gray)
                 }
                 
                 Divider()
                 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Blocked Categories")
-                        .font(.subheadline)
-                        .fontWeight(.medium)
+                    HStack {
+                        Text("Blocked Categories")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                        Spacer()
+                        Button(action: { showingAddCategory = true }) {
+                            Image(systemName: "plus.circle.fill")
+                                .foregroundColor(.purple)
+                        }
+                    }
                     
-                    ForEach(restrictedCategories, id: \.self) { category in
+                    ForEach(Array(merchantManager.restrictedCategories), id: \.self) { category in
                         HStack {
                             Image(systemName: "xmark.circle.fill")
                                 .foregroundColor(.red)
                             Text(category)
                             Spacer()
                             Button("Remove") {
-                                // Remove restriction logic
+                                merchantManager.removeRestrictedCategory(category)
                             }
                             .font(.caption)
                             .foregroundColor(.purple)
                         }
                         .padding(.vertical, 4)
+                    }
+                    
+                    if merchantManager.restrictedCategories.isEmpty {
+                        Text("No restricted categories")
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                            .italic()
                     }
                 }
             }
@@ -200,16 +220,17 @@ struct ParentControlView: View {
                 .foregroundColor(.purple)
             }
             
-            ForEach(ApprovedMerchant.examples, id: \.id) { merchant in
+            ForEach(merchantManager.approvedMerchants) { merchant in
                 HStack {
                     Image(systemName: merchant.icon)
-                        .foregroundColor(.green)
+                        .foregroundColor(merchant.isActive ? .green : .gray)
                         .frame(width: 30)
                     
                     VStack(alignment: .leading, spacing: 2) {
                         Text(merchant.name)
                             .font(.subheadline)
                             .fontWeight(.medium)
+                            .strikethrough(!merchant.isActive)
                         Text(merchant.category)
                             .font(.caption)
                             .foregroundColor(.gray)
@@ -217,8 +238,31 @@ struct ParentControlView: View {
                     
                     Spacer()
                     
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(.green)
+                    HStack(spacing: 12) {
+                        Button(action: {
+                            merchantManager.toggleMerchantStatus(merchant)
+                        }) {
+                            Image(systemName: merchant.isActive ? "checkmark.circle.fill" : "circle")
+                                .foregroundColor(merchant.isActive ? .green : .gray)
+                        }
+                        
+                        Button(action: {
+                            editingMerchant = merchant
+                            showingAddMerchant = true
+                        }) {
+                            Image(systemName: "pencil.circle")
+                                .foregroundColor(.blue)
+                        }
+                        
+                        Button(action: {
+                            if let index = merchantManager.approvedMerchants.firstIndex(where: { $0.id == merchant.id }) {
+                                merchantManager.removeMerchant(at: IndexSet(integer: index))
+                            }
+                        }) {
+                            Image(systemName: "trash.circle")
+                                .foregroundColor(.red)
+                        }
+                    }
                 }
                 .padding()
                 .background(Color.white)
@@ -291,17 +335,20 @@ struct ParentControlView: View {
                     }
                 }
             }
-            .navigationTitle("Add Merchant")
+            .navigationTitle(editingMerchant != nil ? "Edit Merchant" : "Add Merchant")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Cancel") {
                         showingAddMerchant = false
+                        editingMerchant = nil
+                        newMerchantName = ""
+                        newMerchantCategory = "Shopping"
                     }
                 }
                 
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Add") {
+                    Button(editingMerchant != nil ? "Save" : "Add") {
                         addMerchant()
                         showingAddMerchant = false
                     }
@@ -309,11 +356,17 @@ struct ParentControlView: View {
                 }
             }
         }
+        .onAppear {
+            if let merchant = editingMerchant {
+                newMerchantName = merchant.name
+                newMerchantCategory = merchant.category
+            }
+        }
     }
     
     private func sendAllowance() async {
         // In production, this would create an ASA transfer transaction
-        print("Sending weekly allowance of \(allowanceAmount) ALGO")
+        print("Sending weekly allowance of $\(allowanceAmount) USD")
         
         // Mock the allowance transfer for demo
         await MainActor.run {
@@ -321,11 +374,63 @@ struct ParentControlView: View {
         }
     }
     
+    private var addCategorySheet: some View {
+        NavigationStack {
+            Form {
+                Section("New Restricted Category") {
+                    TextField("Category Name", text: $newRestrictedCategory)
+                }
+            }
+            .navigationTitle("Add Restricted Category")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") {
+                        showingAddCategory = false
+                        newRestrictedCategory = ""
+                    }
+                }
+                
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Add") {
+                        if !newRestrictedCategory.isEmpty {
+                            merchantManager.addRestrictedCategory(newRestrictedCategory)
+                            newRestrictedCategory = ""
+                            showingAddCategory = false
+                        }
+                    }
+                    .disabled(newRestrictedCategory.isEmpty)
+                }
+            }
+        }
+    }
+    
     private func addMerchant() {
+        let newMerchant = ApprovedMerchant(
+            name: newMerchantName,
+            category: newMerchantCategory,
+            icon: ApprovedMerchant.getCategoryIcon(for: newMerchantCategory)
+        )
+        
+        if let editingMerchant = editingMerchant {
+            // Update existing merchant
+            var updatedMerchant = editingMerchant
+            updatedMerchant.name = newMerchantName
+            updatedMerchant.category = newMerchantCategory
+            updatedMerchant.icon = ApprovedMerchant.getCategoryIcon(for: newMerchantCategory)
+            merchantManager.updateMerchant(updatedMerchant)
+        } else {
+            // Add new merchant
+            merchantManager.addMerchant(newMerchant)
+        }
+        
         // In production, this would create an on-chain attestation
-        print("Adding merchant attestation: \(newMerchantName) - \(newMerchantCategory)")
+        print("Adding/updating merchant attestation: \(newMerchantName) - \(newMerchantCategory)")
+        
+        // Reset form
         newMerchantName = ""
         newMerchantCategory = "Shopping"
+        editingMerchant = nil
     }
 }
 

@@ -216,8 +216,8 @@ class AlgorandService: ObservableObject {
         // Simulate atomic transfer verification
         try? await Task.sleep(nanoseconds: 2_000_000_000) // 2 second delay for demo
         
-        // Check if purchase is approved based on category and amount
-        let isApproved = checkPurchaseApproval(category: category, amount: amount)
+        // Check if purchase is approved based on category, amount, and merchant
+        let isApproved = checkPurchaseApproval(category: category, amount: amount, merchant: merchant)
         
         if isApproved {
             // Simulate successful transaction
@@ -242,17 +242,24 @@ class AlgorandService: ObservableObject {
         }
     }
     
-    private func checkPurchaseApproval(category: String, amount: Double) -> Bool {
-        // Demo rules for purchase approval
-        let restrictedCategories = ["Gaming", "Gambling"]
-        let dailyLimit: Double = 50.0
+    private func checkPurchaseApproval(category: String, amount: Double, merchant: String? = nil) -> Bool {
+        // Use MerchantManager for dynamic restrictions
+        let merchantManager = MerchantManager()
         
-        if restrictedCategories.contains(category) {
-            return false
-        }
-        
-        if amount > dailyLimit {
-            return false
+        // Check if purchase is allowed by parent restrictions
+        if let merchantName = merchant {
+            if !merchantManager.isPurchaseAllowed(merchant: merchantName, category: category, amount: amount) {
+                return false
+            }
+        } else {
+            // Check category and amount only
+            if merchantManager.isCategoryRestricted(category) {
+                return false
+            }
+            
+            if amount > merchantManager.dailyLimit {
+                return false
+            }
         }
         
         // Check if user has enough ALGO for the USD purchase (amount / 100)

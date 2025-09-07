@@ -56,6 +56,7 @@ enum PurchaseJustification: String, Codable, CaseIterable {
     case charity = "Charity/Community"
     case family_approved = "Family Approved"
     case emergency = "Emergency"
+    case investment = "Investment"
     
     var description: String {
         switch self {
@@ -67,6 +68,7 @@ enum PurchaseJustification: String, Codable, CaseIterable {
         case .charity: return "Charitable donation or community service"
         case .family_approved: return "Family-discussed purchase"
         case .emergency: return "Unexpected emergency expense"
+        case .investment: return "Financial investment for future growth"
         }
     }
     
@@ -80,6 +82,7 @@ enum PurchaseJustification: String, Codable, CaseIterable {
         case .charity: return "hand.raised.fill"
         case .family_approved: return "person.2.fill"
         case .emergency: return "exclamationmark.triangle.fill"
+        case .investment: return "chart.line.uptrend.xyaxis"
         }
     }
     
@@ -93,6 +96,7 @@ enum PurchaseJustification: String, Codable, CaseIterable {
         case .charity: return 1.8
         case .family_approved: return 1.1
         case .emergency: return 0.9
+        case .investment: return 2.0
         }
     }
 }
