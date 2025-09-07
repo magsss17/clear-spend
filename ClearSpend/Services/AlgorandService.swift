@@ -45,21 +45,13 @@ class AlgorandService: ObservableObject {
     static let testWallet1Address = "A4LCT5DIHALLMID6J3F5DLOIFWOU7PPEF6GPIA2FA37UYXCLORMT537TOI"
     static let testWallet2Address = "QWCF2G23COMXXBZQVOJHLIH74YDACEZBQGD5RQTKPMTUXEGJONEBDKGLNA"
     
-    // Demo wallet for hackathon
-    private let demoAddress = testWallet1Address
+    // Real funded wallet for hackathon demo
+    private let demoAddress = "UYN4IOH5G2HRKRITQVDDE4IAIZZ4NHGR3GQZSWFYGOIUGZFB2RCCZKNWGQ"
+    private let recipientAddress = "A4LCT5DIHALLMID6J3F5DLOIFWOU7PPEF6GPIA2FA37UYXCLORMT537TOI"
     
     // WARNING: In production, these should be stored securely (Keychain/Privy)
-    // For hackathon demo, we'll allow setting them directly
-    private var wallet1SecretKey: String = ""
-    private var wallet2SecretKey: String = ""
-    
-    // Method to set secret keys (ONLY for development/demo)
-    func setSecretKeys(wallet1: String, wallet2: String) {
-        self.wallet1SecretKey = wallet1
-        self.wallet2SecretKey = wallet2
-        print("🔐 Secret keys configured for real transactions")
-        print("⚠️  WARNING: In production, use secure key management (Keychain/Privy)")
-    }
+    // For hackathon demo, we'll use the real mnemonic
+    private let walletMnemonic = "first canvas energy brass base lamp trouble fee soda first voyage panic giggle differ palace kitchen empty sword palm treat warfare artefact rib absent midnight"
     
     init() {
         setupDemoWallet()
@@ -331,41 +323,52 @@ class AlgorandService: ObservableObject {
     }
     
     private func sendPurchaseTransaction(amount: Double, merchant: String, category: String) async throws -> String {
-        guard !wallet1SecretKey.isEmpty else {
-            print("⚠️  No secret key found - falling back to simulation")
-            return try await simulateTransaction(amount: amount, merchant: merchant, category: category)
+        // Call the transaction server to create a real Algorand testnet transaction
+        guard let url = URL(string: "http://localhost:3000/create-transaction") else {
+            throw AlgorandError.invalidURL
         }
         
+        let requestData: [String: Any] = [
+            "merchant": merchant,
+            "amount": amount,
+            "category": category,
+            "transactionType": "spend"
+        ]
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
         do {
-            // Convert USD to microALGO: $1 = 0.01 ALGO = 10,000 microALGO (1 ALGO = $100)
-            let microAlgoAmount = UInt64(amount * 10_000)
+            request.httpBody = try JSONSerialization.data(withJSONObject: requestData)
             
-            // Get transaction parameters
-            let params = try await getTransactionParams()
+            let (data, response) = try await URLSession.shared.data(for: request)
             
-            // Create and sign transaction
-            let signedTxn = try await createAndSignPaymentTransaction(
-                from: AlgorandService.testWallet1Address,
-                to: AlgorandService.testWallet2Address,
-                amount: microAlgoAmount,
-                note: "Purchase: \(merchant) - \(category)",
-                params: params,
-                secretKey: wallet1SecretKey
-            )
+            if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
+                if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+                   let success = json["success"] as? Bool,
+                   success,
+                   let transactionId = json["transactionId"] as? String {
+                    
+                    print("✅ REAL ALGO transaction created via server!")
+                    print("🔗 Amount: $\(amount)")
+                    print("📋 Transaction ID: \(transactionId)")
+                    print("🏪 Merchant: \(merchant) (\(category))")
+                    print("🌐 Explorer: https://lora.algokit.io/testnet/transaction/\(transactionId)")
+                    
+                    return transactionId
+                } else if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+                          let error = json["error"] as? String {
+                    throw AlgorandError.transactionFailed
+                }
+            }
             
-            // Submit to network
-            let txId = try await submitTransaction(signedTxn)
-            
-            print("✅ REAL ALGO transaction submitted!")
-            print("🔗 Amount: $\(amount) (\(microAlgoAmount) microALGO)")
-            print("📋 Transaction ID: \(txId)")
-            print("🏪 Merchant: \(merchant) (\(category))")
-            print("🌐 Explorer: https://lora.algokit.io/testnet/transaction/\(txId)")
-            
-            return txId
+            // Fall back to simulation if server fails
+            print("⚠️  Transaction server failed - falling back to simulation")
+            return try await simulateTransaction(amount: amount, merchant: merchant, category: category)
             
         } catch {
-            print("❌ Real transaction failed: \(error)")
+            print("❌ Error calling transaction server: \(error)")
             // Fall back to simulation for demo continuity
             return try await simulateTransaction(amount: amount, merchant: merchant, category: category)
         }
@@ -389,35 +392,52 @@ class AlgorandService: ObservableObject {
     }
     
     private func sendInvestmentTransaction(amount: Double) async throws -> String {
-        guard !wallet1SecretKey.isEmpty else {
-            print("⚠️  No secret key found - falling back to investment simulation")
-            return try await simulateInvestmentTransaction(amount: amount)
+        // Call the transaction server to create a real Algorand testnet investment transaction
+        guard let url = URL(string: "http://localhost:3000/create-transaction") else {
+            throw AlgorandError.invalidURL
         }
         
+        let requestData: [String: Any] = [
+            "merchant": "Investment Portfolio",
+            "amount": amount,
+            "category": "Investment",
+            "transactionType": "invest"
+        ]
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
         do {
-            let microAlgoAmount = UInt64(amount * 10_000) // $1 = 0.01 ALGO = 10,000 microALGO
-            let params = try await getTransactionParams()
+            request.httpBody = try JSONSerialization.data(withJSONObject: requestData)
             
-            let signedTxn = try await createAndSignPaymentTransaction(
-                from: AlgorandService.testWallet1Address,
-                to: AlgorandService.testWallet2Address,
-                amount: microAlgoAmount,
-                note: "Investment transaction - $\(amount)",
-                params: params,
-                secretKey: wallet1SecretKey
-            )
+            let (data, response) = try await URLSession.shared.data(for: request)
             
-            let txId = try await submitTransaction(signedTxn)
+            if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
+                if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+                   let success = json["success"] as? Bool,
+                   success,
+                   let transactionId = json["transactionId"] as? String {
+                    
+                    print("✅ REAL ALGO investment created via server!")
+                    print("🔗 Investment Amount: $\(amount)")
+                    print("📋 Transaction ID: \(transactionId)")
+                    print("🌐 Explorer: https://lora.algokit.io/testnet/transaction/\(transactionId)")
+                    
+                    return transactionId
+                } else if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+                          let error = json["error"] as? String {
+                    throw AlgorandError.transactionFailed
+                }
+            }
             
-            print("✅ REAL ALGO investment submitted!")
-            print("🔗 Investment Amount: $\(amount) (\(microAlgoAmount) microALGO)")
-            print("📋 Transaction ID: \(txId)")
-            print("🌐 Explorer: https://lora.algokit.io/testnet/transaction/\(txId)")
-            
-            return txId
+            // Fall back to simulation if server fails
+            print("⚠️  Investment server failed - falling back to simulation")
+            return try await simulateInvestmentTransaction(amount: amount)
             
         } catch {
-            print("❌ Real investment transaction failed: \(error)")
+            print("❌ Error calling investment server: \(error)")
+            // Fall back to simulation for demo continuity
             return try await simulateInvestmentTransaction(amount: amount)
         }
     }
@@ -437,102 +457,9 @@ class AlgorandService: ObservableObject {
         return String((0..<52).map { _ in letters.randomElement()! })
     }
     
-    // MARK: - Real Transaction Implementation
-    
-    private func getTransactionParams() async throws -> [String: Any] {
-        guard let url = URL(string: "\(testnetURL)/v2/transactions/params") else {
-            throw AlgorandError.invalidURL
-        }
-        
-        let (data, _) = try await URLSession.shared.data(from: url)
-        guard let params = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-            throw AlgorandError.transactionFailed
-        }
-        
-        return params
-    }
-    
-    private func createAndSignPaymentTransaction(
-        from sender: String,
-        to receiver: String,
-        amount: UInt64,
-        note: String,
-        params: [String: Any],
-        secretKey: String
-    ) async throws -> Data {
-        
-        guard let firstRound = params["last-round"] as? Int,
-              let genesisHash = params["genesis-hash"] as? String,
-              let genesisId = params["genesis-id"] as? String else {
-            throw AlgorandError.transactionFailed
-        }
-        
-        // Create simplified transaction object for demo (avoiding Data objects that cause JSON issues)
-        let transaction: [String: Any] = [
-            "type": "pay",
-            "sender": sender,
-            "receiver": receiver,
-            "amt": amount,
-            "fee": UInt64(1000), // 0.001 ALGO fee
-            "fv": UInt64(firstRound),
-            "lv": UInt64(firstRound + 1000),
-            "gen": genesisId,
-            "gh": genesisHash,
-            "note": note
-        ]
-        
-        // For demo, we'll create a simplified signed transaction
-        // In production, you'd use proper msgpack encoding and Ed25519 signing
-        let signedTransaction = try await signTransaction(transaction, with: secretKey)
-        
-        return signedTransaction
-    }
-    
-    private func signTransaction(_ transaction: [String: Any], with secretKey: String) async throws -> Data {
-        // For demo purposes, create a simplified transaction representation
-        // In production, you'd properly encode with msgpack and sign with Ed25519
-        
-        // Create a simplified transaction for demo that avoids Data objects in JSON
-        let simplifiedTransaction: [String: Any] = [
-            "type": transaction["type"] as? String ?? "pay",
-            "sender": AlgorandService.testWallet1Address,
-            "receiver": AlgorandService.testWallet2Address, 
-            "amount": transaction["amt"] as? UInt64 ?? 0,
-            "fee": transaction["fee"] as? UInt64 ?? 1000,
-            "note": "Demo transaction - simulated signing",
-            "timestamp": Date().timeIntervalSince1970
-        ]
-        
-        guard let jsonData = try? JSONSerialization.data(withJSONObject: simplifiedTransaction) else {
-            throw AlgorandError.transactionSigningFailed
-        }
-        
-        // Return simplified demo data instead of real signed transaction
-        return jsonData
-    }
-    
-    private func submitTransaction(_ signedTransaction: Data) async throws -> String {
-        guard let url = URL(string: "\(testnetURL)/v2/transactions") else {
-            throw AlgorandError.invalidURL
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/x-binary", forHTTPHeaderField: "Content-Type")
-        request.httpBody = signedTransaction
-        
-        let (data, response) = try await URLSession.shared.data(for: request)
-        
-        if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
-            if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-               let txId = json["txId"] as? String {
-                return txId
-            }
-        }
-        
-        // If submission fails, generate a realistic transaction ID for demo
-        throw AlgorandError.transactionFailed
-    }
+    // MARK: - Transaction Server Integration
+    // Real transaction creation is now handled by the Node.js transaction server
+    // This keeps the iOS app simple and delegates complex Algorand operations to the server
     
     func getTransactionHistory() async -> [Transaction] {
         // Return mock transaction history with enhanced data for main branch compatibility
