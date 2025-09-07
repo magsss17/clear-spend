@@ -169,6 +169,31 @@ struct LearnView: View {
                     selectedModule = module
                 }
             }
+            
+            // Additional educational resources with hyperlinks
+            InfoCard(
+                title: "Smart budgeting",
+                description: "Learn popular budgeting strategies to manage your money effectively and build long-term wealth.",
+                icon: "chart.pie.fill",
+                color: .green,
+                url: "https://srfs.upenn.edu/financial-wellness/browse-topics/budgeting/popular-budgeting-strategies"
+            )
+            
+            InfoCard(
+                title: "Fraud",
+                description: "Protect yourself from scams and fraudulent activities. Learn how to identify and avoid common financial traps.",
+                icon: "shield.fill",
+                color: .red,
+                url: "https://consumer.ftc.gov/articles/how-avoid-scam?utm_source=chatgpt.com"
+            )
+            
+            InfoCard(
+                title: "Savings",
+                description: "Build emergency funds and prepare for unexpected expenses. Learn essential risk management strategies.",
+                icon: "banknote.fill",
+                color: .blue,
+                url: "https://www.federalreserveeducation.org/teaching-resources/personal-finance/managing-risk/when-the-unexpected-happens?utm_source=chatgpt.com"
+            )
         }
     }
     
@@ -298,10 +323,11 @@ struct LearnView: View {
             
             VStack(spacing: 12) {
                 InfoCard(
-                    title: "What is a DAO?",
+                    title: "DAO",
                     description: "Decentralized Autonomous Organizations let communities make decisions together without traditional management. Members vote on proposals using digital tokens.",
                     icon: "person.3.fill",
-                    color: .blue
+                    color: .blue,
+                    url: "https://ethereum.org/dao/?utm_source=chatgpt.com"
                 )
                 
             }
@@ -319,17 +345,19 @@ struct LearnView: View {
             
             VStack(spacing: 12) {
                 InfoCard(
-                    title: "Staking Rewards",
+                    title: "Staking rewards",
                     description: "Lock up your digital assets to help secure networks and earn steady rewards. Think of it like earning interest on your savings.",
                     icon: "lock.shield.fill",
-                    color: .green
+                    color: .green,
+                    url: "https://ethereum.org/staking/?utm_source=chatgpt.com"
                 )
                 
                 InfoCard(
-                    title: "Liquidity Providing",
+                    title: "Liquidity provisioning",
                     description: "Provide funds to decentralized exchanges and earn fees from traders. You become part of the financial infrastructure.",
                     icon: "arrow.triangle.2.circlepath",
-                    color: .purple
+                    color: .purple,
+                    url: "https://docs.uniswap.org/contracts/v2/concepts/advanced-topics/understanding-returns?utm_source=chatgpt.com"
                 )
                 
             }
@@ -432,6 +460,15 @@ struct InfoCard: View {
     let description: String
     let icon: String
     let color: Color
+    let url: String?
+    
+    init(title: String, description: String, icon: String, color: Color, url: String? = nil) {
+        self.title = title
+        self.description = description
+        self.icon = icon
+        self.color = color
+        self.url = url
+    }
     
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
@@ -441,9 +478,24 @@ struct InfoCard: View {
                 .frame(width: 30)
             
             VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
+                if let url = url {
+                    Button(action: {
+                        if let urlObject = URL(string: url) {
+                            UIApplication.shared.open(urlObject)
+                        }
+                    }) {
+                        Text(title)
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.primary)
+                            .multilineTextAlignment(.leading)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                } else {
+                    Text(title)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                }
                 
                 Text(description)
                     .font(.caption)
