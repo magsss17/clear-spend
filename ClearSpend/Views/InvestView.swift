@@ -28,7 +28,7 @@ struct InvestView: View {
             HStack(spacing: 16) {
                 PortfolioCard(
                     title: "Balance",
-                    amount: algorandService.isLoadingBalance ? "Loading..." : "\(walletViewModel.formattedBalanceWithDollar)",
+                    amount: walletViewModel.isLoading ? "Loading..." : "\(walletViewModel.formattedBalanceWithDollar)",
                     percentage: "+5.2%",
                     icon: "banknote",
                     color: .green
@@ -207,7 +207,7 @@ struct InvestmentOptionCard: View {
                     Button(isInvesting ? "Investing..." : "Invest") {
                         Task {
                             isInvesting = true
-                            let result = await algorandService.processInvestment(amount: 2.0, investmentType: title)
+                            let result = await algorandService.processPurchase(merchant: title, amount: 2.0, category: "Investment")
                             await MainActor.run {
                                 if result.success {
                                     // Refresh balance after successful investment

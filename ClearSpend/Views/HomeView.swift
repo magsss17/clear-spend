@@ -64,7 +64,7 @@ struct HomeView: View {
             }
             
             HStack(alignment: .bottom, spacing: 8) {
-                if algorandService.isLoadingBalance {
+                if walletViewModel.isLoading {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle())
                         .scaleEffect(1.5)
