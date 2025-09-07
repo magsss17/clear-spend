@@ -20,6 +20,7 @@
 		C5A1B11A1D4B2C9700123456 /* TransactionHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A1B1191D4B2C9700123456 /* TransactionHistoryView.swift */; };
 		C5A1B11C1D4B2C9F00123456 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A1B11B1D4B2C9F00123456 /* SettingsView.swift */; };
 		C5A1B11E1D4B2CA700123456 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A1B11D1D4B2CA700123456 /* Transaction.swift */; };
+		C5A1B1261D4B2CC700123456 /* ApprovedMerchant.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A1B1251D4B2CC700123456 /* ApprovedMerchant.swift */; };
 		C5A1B1201D4B2CAF00123456 /* AlgorandService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A1B11F1D4B2CAF00123456 /* AlgorandService.swift */; };
 		C5A1B1221D4B2CB700123456 /* WalletViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A1B1211D4B2CB700123456 /* WalletViewModel.swift */; };
 		C5A1B1241D4B2CBF00123456 /* ParentControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A1B1231D4B2CBF00123456 /* ParentControlView.swift */; };
@@ -40,6 +41,7 @@
 		C5A1B1191D4B2C9700123456 /* TransactionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionHistoryView.swift; sourceTree = "<group>"; };
 		C5A1B11B1D4B2C9F00123456 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		C5A1B11D1D4B2CA700123456 /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
+		C5A1B1251D4B2CC700123456 /* ApprovedMerchant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApprovedMerchant.swift; sourceTree = "<group>"; };
 		C5A1B11F1D4B2CAF00123456 /* AlgorandService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgorandService.swift; sourceTree = "<group>"; };
 		C5A1B1211D4B2CB700123456 /* WalletViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletViewModel.swift; sourceTree = "<group>"; };
 		C5A1B1231D4B2CBF00123456 /* ParentControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParentControlView.swift; sourceTree = "<group>"; };
@@ -115,6 +117,7 @@
 			isa = PBXGroup;
 			children = (
 				C5A1B11D1D4B2CA700123456 /* Transaction.swift */,
+				C5A1B1251D4B2CC700123456 /* ApprovedMerchant.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -216,6 +219,7 @@
 				C5A1B11A1D4B2C9700123456 /* TransactionHistoryView.swift in Sources */,
 				C5A1B11C1D4B2C9F00123456 /* SettingsView.swift in Sources */,
 				C5A1B11E1D4B2CA700123456 /* Transaction.swift in Sources */,
+				C5A1B1261D4B2CC700123456 /* ApprovedMerchant.swift in Sources */,
 				C5A1B1201D4B2CAF00123456 /* AlgorandService.swift in Sources */,
 				C5A1B1221D4B2CB700123456 /* WalletViewModel.swift in Sources */,
 				C5A1B1241D4B2CBF00123456 /* ParentControlView.swift in Sources */,

@@ -3,6 +3,7 @@ import SwiftUI
 struct SpendView: View {
     @EnvironmentObject var algorandService: AlgorandService
     @EnvironmentObject var walletViewModel: WalletViewModel
+    @StateObject private var merchantManager = MerchantManager()
     @State private var merchantName = ""
     @State private var amount = "2.00"
     @State private var category = "Shopping"
@@ -238,16 +239,10 @@ struct SpendView: View {
     
     private var merchantSuggestions: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text("Verified Merchants")
-                    .font(.headline)
-                Spacer()
-                Text("Reputation Score")
-                    .font(.caption)
-                    .foregroundColor(.gray)
-            }
+            Text("Approved Merchants")
+                .font(.headline)
             
-            ForEach(ApprovedMerchant.examples, id: \.id) { merchant in
+            ForEach(merchantManager.approvedMerchants.filter { $0.isActive }) { merchant in
                 HStack {
                     Image(systemName: merchant.icon)
                         .foregroundColor(.purple)
@@ -256,73 +251,24 @@ struct SpendView: View {
                         .cornerRadius(8)
                     
                     VStack(alignment: .leading, spacing: 4) {
-                        HStack {
-                            Text(merchant.name)
-                                .font(.subheadline)
-                                .fontWeight(.medium)
-                            
-                            if merchant.businessLicenseVerified {
-                                Image(systemName: "checkmark.shield.fill")
-                                    .font(.caption)
-                                    .foregroundColor(.blue)
-                            }
-                        }
+                        Text(merchant.name)
+                            .font(.subheadline)
+                            .fontWeight(.medium)
                         
-                        HStack {
-                            Text(merchant.category)
-                                .font(.caption)
-                                .foregroundColor(.gray)
-                            
-                            Text("•")
-                                .foregroundColor(.gray)
-                            
-                            Text("\(merchant.monthlyTransactions) transactions")
-                                .font(.caption)
-                                .foregroundColor(.gray)
-                        }
-                        
-                        HStack {
-                            Text(merchant.trustLevel.rawValue)
-                                .font(.caption)
-                                .fontWeight(.medium)
-                                .foregroundColor(Color(merchant.trustLevel.color))
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(Color(merchant.trustLevel.color).opacity(0.1))
-                                .cornerRadius(4)
-                            
-                            if merchant.fraudReports > 0 {
-                                Text("\(merchant.fraudReports) fraud reports")
-                                    .font(.caption)
-                                    .foregroundColor(.orange)
-                            }
-                        }
+                        Text(merchant.category)
+                            .font(.caption)
+                            .foregroundColor(.gray)
                     }
                     
                     Spacer()
                     
-                    VStack(spacing: 4) {
-                        Text(String(format: "%.1f", merchant.overallScore))
-                            .font(.title3)
-                            .fontWeight(.bold)
-                            .foregroundColor(Color(merchant.trustLevel.color))
-                        
-                        HStack(spacing: 2) {
-                            ForEach(0..<5) { index in
-                                Image(systemName: "star.fill")
-                                    .font(.caption2)
-                                    .foregroundColor(index < Int(merchant.overallScore / 2) ? Color(merchant.trustLevel.color) : Color.gray.opacity(0.3))
-                            }
-                        }
-                    }
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(.green)
                 }
                 .padding()
-                .background(Color.gray.opacity(0.15))
+                .background(Color.white)
                 .cornerRadius(12)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color(merchant.trustLevel.color).opacity(0.3), lineWidth: 1)
-                )
+                .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
                 .onTapGesture {
                     merchantName = merchant.name
                     category = merchant.category
@@ -340,6 +286,13 @@ struct SpendView: View {
                         purchaseJustification = .necessity
                     }
                 }
+            }
+            
+            if merchantManager.approvedMerchants.filter({ $0.isActive }).isEmpty {
+                Text("No approved merchants yet")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+                    .italic()
             }
         }
         .padding()

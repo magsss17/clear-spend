@@ -1,7 +1,7 @@
 import Foundation
 
 struct ApprovedMerchant: Identifiable, Codable {
-    let id = UUID()
+    var id: UUID = UUID()
     var name: String
     var category: String
     var icon: String
@@ -140,6 +140,12 @@ class MerchantManager: ObservableObject {
         // If no saved data, use defaults
         if approvedMerchants.isEmpty {
             approvedMerchants = ApprovedMerchant.examples
+        }
+        
+        // Remove Shopping from restricted categories if it was previously added
+        if restrictedCategories.contains("Shopping") {
+            restrictedCategories.remove("Shopping")
+            saveRestrictions()
         }
     }
 }
