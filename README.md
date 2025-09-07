@@ -1,383 +1,452 @@
 # ClearSpend - Teen Financial Literacy on Algorand
 
-**Description:** Teen spending made safe: verified purchases, lifelong money habits, and financial literacy app.
+## Algorand x EasyA Harvard Hackathon Submission
 
-## Demo Video
-> **[Watch Demo Video](https://youtu.be/YOUR_DEMO_VIDEO_ID)** - See ClearSpend in action with real Algorand transactions
-
-## Technical Explanation Video
-> **[Watch Technical Video](https://youtu.be/YOUR_TECHNICAL_VIDEO_ID)** - Deep dive into smart contracts, atomic transfers, and project structure
-
-## Presentation Slides
-> **[View Canva Presentation](https://canva.com/YOUR_PRESENTATION_LINK)** - Team, problem, solution, and technical details
-
----
+ClearSpend is a blockchain-powered teen spending app that teaches financial responsibility through verifiable, parent-controlled digital allowances on Algorand.
 
 ## Problem Statement
 
-**The Challenge:** Teens lack transparent, educational tools for managing money digitally while parents struggle to monitor and guide spending habits effectively. Traditional teen debit cards offer limited controls and no verifiable spending history for building credit reputation.
-
-**The Impact:** 
-- 73% of teens have never been taught how to budget
-- Parents can't verify where teen spending actually occurs
-- No transparent system for building financial reputation from a young age
-- Traditional banking tools lack educational components and real-time controls
+Teens lack transparent, educational tools for managing money digitally while parents struggle to monitor and guide spending habits effectively. Traditional teen debit cards offer limited controls and no verifiable spending history for building credit reputation.
 
 ## Our Solution
 
-ClearSpend leverages **Algorand's unique blockchain features** to create a trustless system where:
+ClearSpend leverages Algorand's atomic transfers and smart contracts to create a trustless system where:
+- **Every purchase is pre-verified** before money moves
+- **Parents set smart controls** via on-chain attestations
+- **Teens build verifiable spending history** for future credit
+- **Educational gamification** teaches financial literacy
 
-- **Every purchase is pre-verified** before money moves using atomic transfers  
-- **Parents set smart controls** via on-chain attestations and box storage  
-- **Teens build verifiable spending history** for future credit through blockchain records  
-- **Educational gamification** teaches financial literacy with real-world consequences  
+## Key Features
 
-### Why Algorand?
-- **Atomic Transfers**: Enables trustless purchase verification in single transaction groups
-- **Box Storage**: Efficient on-chain storage for merchant attestations and spending limits
-- **Low Fees**: Enables micro-transactions for educational purposes
-- **Speed**: Instant transaction confirmation for real-time purchase approval
-- **Smart Contracts**: Custom logic for complex parental controls and educational features
+### Core Hackathon Features (MVP)
+- **ASA-based Allowances**: Weekly allowances issued as Algorand Standard Assets
+- **Atomic Transfer Verification**: Purchases verified through atomic groups before execution
+- **On-chain Attestation**: Oracle-based merchant/category verification via box storage
+- **iOS Demo App**: Native SwiftUI app with teen-focused UX
 
----
+![Spend Interface](docs/images/spend.png)
+*Smart purchase flow with real-time merchant verification*
 
-## Key Features & Screenshots
+### Smart Contract Architecture
+1. **Attestation Oracle Contract** (`attestation_oracle.py`)
+   - Merchant approval attestations in box storage
+   - Category restrictions and daily limits
+   - Real-time purchase verification
 
-### iOS App Interface
+2. **Allowance Manager Contract** (`allowance_manager.py`)
+   - Parent-controlled allowance issuance
+   - Timelock savings functionality
+   - Pause/resume capabilities
 
-#### Home Dashboard
-![Home Screen](docs/screenshots/home-screen.png)
-*Teen dashboard showing balance, credit score, and recent transactions with purple/white design*
+### Atomic Transfer Flow
+```
+1. App Call → Check attestation exists
+2. App Call → Verify spending limits
+3. ASA Transfer → Execute only if approved
+```
 
-#### Smart Purchase Flow
-![Purchase Flow](docs/screenshots/purchase-flow.png)
-*Category-based spending with real-time verification through smart contracts*
+## How It Works
 
-#### Financial Education
-![Learn Module](docs/screenshots/learn-module.png)
-*Gamified financial literacy with XP rewards for completing educational content*
+### System Architecture Overview
 
-### Blockchain Integration
+ClearSpend operates on a three-layer architecture that ensures secure, verifiable transactions while maintaining educational value for teens:
 
-#### Real Testnet Transactions
-- **Funded Wallet**: `UYN4IOH5G2HRKRITQVDDE4IAIZZ4NHGR3GQZSWFYGOIUGZFB2RCCZKNWGQ`
-- **Smart Contract App IDs**: 
-  - Attestation Oracle: `12345` (deployed on testnet)
-  - Allowance Manager: `12346` (deployed on testnet)
-- **Live Explorer Links**: All transactions viewable on [Algorand TestNet Explorer](https://testnet.algoexplorer.io)
+```
+┌─────────────────┐    ┌─────────────────┐    ┌──────────────────┐
+│   iOS App       │    │   Backend API   │    │   Algorand       │
+│   (Teen UI)     │◄──►│   (FastAPI)     │◄──►│   Blockchain     │
+│                 │    │                 │    │                  │
+│ • Spend View    │    │ • Oracle Service│    │ • Smart Contracts│
+│ • Home View     │    │ • Blockchain    │    │ • ASA Transfers  │
+│ • Learn View    │    │   Service       │    │ • Box Storage    │
+└─────────────────┘    └─────────────────┘    └──────────────────┘
+```
 
----
+#### App Interface Preview
+![Recent Activity](docs/images/recent-activity.png)
+*Home screen showing balance, recent transactions, and quick actions*
 
-## Custom Smart Contracts
+### 1. **Parent Setup & Allowance Management**
 
-### 1. Attestation Oracle Contract (`backend/contracts/attestation_oracle.py`)
+**Initial Setup:**
+- Parent creates Algorand wallet and deploys smart contracts
+- Parent configures spending rules via the Attestation Oracle
+- Parent issues weekly allowance as ASA (Algorand Standard Asset)
 
-**Custom Features:**
-- **Box Storage Implementation**: Efficient on-chain merchant attestation storage
-- **Atomic Purchase Verification**: Verifies purchases as part of atomic transaction groups
-- **Dynamic Daily Limits**: Per-merchant spending limits that reset automatically
-- **Category Restrictions**: Blocks purchases from restricted categories (gambling, adult content)
-- **Parent Approval System**: On-chain parent approval for specific merchants
-
+**Allowance Manager Contract:**
 ```python
-@arc4.abimethod
-def verify_purchase(
-    self,
-    merchant_name: String,
-    amount: UInt64,
-    user_address: arc4.Address
-) -> Bool:
-    """
-    Custom verification logic that:
-    1. Checks merchant attestation from box storage
-    2. Validates daily spending limits
-    3. Enforces category restrictions
-    4. Updates spending counters atomically
-    """
+# Parent sets up allowance with restrictions
+allowance_manager.create_allowance(
+    teen_address="TEEN_WALLET_ADDRESS",
+    weekly_amount=100000000,  # 100 ALGO
+    categories=["Food", "Entertainment", "Education"],
+    daily_limit=50000000     # 50 ALGO per day
+)
 ```
 
-### 2. Allowance Manager Contract (`backend/contracts/allowance_manager.py`)
+### 2. **Merchant Verification System**
 
-**Custom Features:**
-- **Timelock Savings**: Teens can lock funds until specific future dates
-- **Emergency Allowance**: Parents can issue immediate funds bypassing weekly limits
-- **Atomic Purchase Processing**: Validates purchases as part of 3-transaction atomic groups
-- **Allowance Control Transfer**: Parents can transfer control to other guardians
-- **Pause/Resume System**: Instant allowance suspension for discipline
+**Oracle Service:**
+- Maintains a database of approved merchants and categories
+- Stores attestations in Algorand Box Storage for scalability
+- Real-time verification of purchase requests
 
+**Merchant Attestation Process:**
 ```python
-@arc4.abimethod
-def process_purchase_atomic(
-    self,
-    merchant_name: String,
-    amount: UInt64
-) -> Bool:
-    """
-    Custom atomic transaction processing:
-    - Validates atomic group structure (3 transactions)
-    - Checks allowance limits
-    - Logs purchase for transparency
-    - Integrates with attestation oracle
-    """
+# Oracle verifies merchant before purchase
+attestation = {
+    "merchant_name": "Starbucks",
+    "category": "Food & Beverage", 
+    "is_approved": True,
+    "daily_limit": 50000000,
+    "parent_approved": True
+}
 ```
 
-### Atomic Transaction Flow
-```
-Group Transaction 1: Attestation Oracle Verification
-Group Transaction 2: Allowance Manager Validation  
-Group Transaction 3: Payment Execution
-→ ALL succeed or ALL fail (atomic guarantee)
-```
+### 3. **Purchase Flow & Verification**
 
----
+**Step-by-Step Purchase Process:**
 
-## Technical Implementation
+1. **Teen Initiates Purchase** (iOS App)
+   - Selects merchant from approved list
+   - Enters purchase amount
+   - App calls backend API for verification
 
-### SDKs and Technologies Used
+2. **Backend Verification** (FastAPI)
+   - Checks merchant attestation in Oracle
+   - Verifies spending limits and category restrictions
+   - Validates teen's current balance
 
-#### Blockchain & Smart Contracts
-- **AlgoKit**: Smart contract development and deployment framework
-- **AlgoPy**: Python-based smart contract programming
-- **Algorand SDK (Python)**: Blockchain interaction and transaction management
-- **Algorand SDK (Swift)**: iOS app blockchain integration
+3. **Atomic Transfer Execution** (Algorand)
+   - Creates atomic transfer group with 3 transactions:
+     - App Call: Verify attestation exists
+     - App Call: Check spending limits
+     - ASA Transfer: Execute payment (only if both checks pass)
 
-#### Backend Architecture
-- **FastAPI**: High-performance async API framework
-- **Pydantic**: Data validation and serialization
-- **AsyncPG**: Asynchronous PostgreSQL database driver
-- **Redis**: Caching and session management
-- **Docker**: Containerized deployment
+4. **Transaction Confirmation**
+   - Success: Teen receives confirmation with Algorand Explorer link
+   - Failure: Clear feedback on why purchase was rejected
 
-#### iOS Development
-- **SwiftUI**: Modern declarative UI framework
-- **Combine**: Reactive programming for data flow
-- **Foundation**: Core iOS functionality
-- **CryptoKit**: Cryptographic operations
+### 4. **Smart Contract Logic**
 
-### Unique Algorand Features Utilized
-
-#### 1. Atomic Transfers
-**Why Unique to Algorand:** Other blockchains require complex multi-signature setups or separate smart contracts for atomic operations. Algorand's native atomic transfers enable trustless purchase verification in a single transaction group.
-
-**Our Implementation:**
-```swift
-// iOS App creates atomic group
-let attestationTxn = ApplicationCallTxn(/* verify purchase */)
-let allowanceTxn = ApplicationCallTxn(/* check limits */)
-let paymentTxn = PaymentTxn(/* execute payment */)
-let groupId = assign_group_id([attestationTxn, allowanceTxn, paymentTxn])
-```
-
-#### 2. Box Storage
-**Why Unique to Algorand:** Ethereum's storage is expensive and limited. Algorand's box storage provides efficient, scalable on-chain data storage perfect for merchant attestations.
-
-**Our Implementation:**
+**Attestation Oracle Contract:**
 ```python
-# Efficient merchant attestation storage
-merchant_key = self._create_merchant_key(merchant_name)
-merchant_box = BoxRef(key=merchant_key)
-merchant_box.put(attestation.bytes)
+def verify_purchase(merchant_name, amount, teen_address):
+    # Check if merchant is approved
+    attestation = get_attestation(merchant_name)
+    if not attestation.is_approved:
+        return False
+    
+    # Check daily spending limit
+    daily_spent = get_daily_spent(teen_address, merchant_name)
+    if daily_spent + amount > attestation.daily_limit:
+        return False
+    
+    # Check category restrictions
+    if not is_category_allowed(attestation.category, teen_address):
+        return False
+    
+    return True
 ```
 
-#### 3. Low Transaction Costs
-**Why Critical for Our Use Case:** Teen spending involves frequent small transactions. Ethereum gas fees would make micro-transactions impossible. Algorand's low fees enable real educational spending.
-
-#### 4. Instant Finality
-**Why Essential:** Teens expect instant purchase approval/denial. Algorand's 3.3-second finality enables real-time spending decisions.
-
----
-
-## Project Structure & Repository
-
-```
-clear-spend/                           # Open Source Repository
-├── backend/                          # FastAPI Backend Service
-│   ├── contracts/                    # CUSTOM SMART CONTRACTS
-│   │   ├── attestation_oracle.py    # Merchant verification contract
-│   │   └── allowance_manager.py     # Allowance management contract
-│   ├── services/                     # Core business logic
-│   │   ├── blockchain_service.py    # Algorand integration
-│   │   └── oracle_service.py        # Purchase verification
-│   ├── api/                          # REST API endpoints
-│   │   ├── routes/                   # API route handlers
-│   │   └── models/                   # Request/response models
-│   ├── deployment/                   # Docker & deployment
-│   ├── tests/                        # Comprehensive testing
-│   └── main.py                       # FastAPI application
-├── ClearSpend/                       # iOS SwiftUI App
-│   ├── Views/                        # SwiftUI user interface
-│   ├── Services/                     # Algorand blockchain integration
-│   ├── ViewModels/                   # Business logic layer
-│   └── Models/                       # Data structures
-├── docs/                             # Documentation
-│   ├── ARCHITECTURE.md               # System design
-│   ├── API.md                        # API documentation
-│   └── screenshots/                  # App screenshots
-├── scripts/                          # Utility scripts
-└── README.md                         # This file
+**Allowance Manager Contract:**
+```python
+def issue_allowance(teen_address, amount):
+    # Check if parent has sufficient balance
+    if get_parent_balance() < amount:
+        return False
+    
+    # Issue ASA to teen
+    transfer_asa(teen_address, amount)
+    
+    # Update allowance tracking
+    update_allowance_history(teen_address, amount)
+    
+    return True
 ```
 
----
+### 5. **Educational Components**
 
-## Getting Started & Demo
+**Gamification System:**
+- Teens earn XP for completing financial education modules
+- Spending history builds verifiable credit reputation
+- Parent-approved categories teach responsible spending
+
+**Learning Modules:**
+- Budgeting basics and expense tracking
+- Understanding interest rates and savings
+- Introduction to investment concepts
+- Credit building and financial responsibility
+
+### 6. **Security & Trust Model**
+
+**Trustless Verification:**
+- All transactions are verified on-chain before execution
+- Parents can't retroactively change rules (immutable smart contracts)
+- Teens can't spend more than allowed (atomic transfer groups)
+
+**Transparency:**
+- All transactions are publicly verifiable on Algorand Explorer
+- Spending history is immutable and auditable
+- Parents can monitor but not interfere with approved transactions
+
+### 7. **Technical Implementation Details**
+
+**Backend Services:**
+- **Blockchain Service**: Handles Algorand SDK interactions
+- **Oracle Service**: Manages merchant attestations and verification
+- **API Routes**: RESTful endpoints for iOS app integration
+
+**iOS App Architecture:**
+- **SwiftUI**: Modern, declarative UI framework
+- **AlgorandService**: Handles blockchain interactions
+- **MerchantService**: Manages merchant data and verification
+- **WalletViewModel**: Business logic and state management
+
+**Data Flow:**
+```
+iOS App → FastAPI Backend → Algorand Smart Contracts → Box Storage
+   ↑                                                           ↓
+   └─────────────── Transaction Confirmation ←─────────────────┘
+```
+
+### 8. **Real-World Integration**
+
+**Merchant Onboarding:**
+- Merchants can register through the Oracle Service
+- Parent approval required for new merchant categories
+- Real-time merchant database updates
+
+**Payment Processing:**
+- Uses Algorand's low fees for micro-transactions
+- Atomic transfers ensure payment security
+- Instant settlement and confirmation
+
+This architecture ensures that ClearSpend provides a secure, educational, and transparent platform for teen financial management while leveraging Algorand's unique blockchain capabilities.
+
+## iOS App Features
+
+### Teen View
+
+#### Home Screen - Balance & Recent Activity
+![Recent Activity](docs/images/recent-activity.png)
+
+- **Home**: Balance display, recent transactions, quick actions
+- Real-time balance updates with Algorand integration
+- Transaction history with explorer links
+
+#### Spend Tab - Smart Purchase Flow
+![Spend Interface](docs/images/spend.png)
+
+- **Spend**: Smart purchase flow with category selection
+- Merchant verification through backend API
+- Real-time purchase approval/rejection
+
+#### Invest Tab - Financial Education
+![Invest Interface](docs/images/invest.png)
+
+- **Invest**: Introduction to saving and investment concepts
+- Educational content about financial responsibility
+- Investment tracking and portfolio management
+
+#### Learn Tab - Gamified Education
+![Learn Interface](docs/images/learn.png)
+
+- **Learn**: Gamified financial education modules
+- Interactive lessons on budgeting and saving
+- Progress tracking and achievement system
+
+### Parent Control Features
+
+#### Parent Dashboard
+![Parent Interface](docs/images/parent.png)
+
+- **Parent Controls**: Set spending limits and merchant restrictions
+- **Category Management**: Approve/deny spending categories
+- **Real-time Monitoring**: Track teen spending activity
+
+#### Parent Settings
+![Parent Settings](docs/images/parent-bottom.png)
+
+- **Allowance Management**: Set weekly/monthly allowances
+- **Merchant Approval**: Control which merchants are allowed
+- **Spending Limits**: Set daily and per-transaction limits
+
+### Technical Implementation
+- SwiftUI for modern iOS UI
+- Algorand SDK integration for blockchain interaction
+- Backend API integration for real-time verification
+- Real-time balance updates
+
+## Technology Stack
+
+- **Blockchain**: Algorand (Testnet)
+- **Smart Contracts**: PyTeal/Algorand Python
+- **iOS**: Swift, SwiftUI
+- **Features Used**:
+  - ASAs (Algorand Standard Assets)
+  - Atomic Transfers
+  - Box Storage
+  - Smart Contract App Calls
+
+## Project Structure
+
+```
+clear-spend/
+├── backend/                    # Backend API & Services
+│   ├── contracts/             # AlgoKit smart contracts
+│   │   ├── attestation_oracle.py
+│   │   └── allowance_manager.py
+│   ├── services/              # Core business logic
+│   │   ├── blockchain_service.py
+│   │   └── oracle_service.py
+│   ├── api/                   # FastAPI endpoints
+│   │   ├── routes/            # API routes
+│   │   └── models/            # Request/Response models
+│   ├── tests/                 # Comprehensive testing
+│   ├── deployment/            # Docker & deployment configs
+│   └── main.py                # FastAPI application
+├── ClearSpend/                # iOS SwiftUI app source code
+│   ├── Views/                 # SwiftUI views
+│   ├── Models/                # Data models
+│   ├── Services/              # Algorand integration
+│   ├── ViewModels/            # Business logic
+│   └── Assets.xcassets/       # App assets and resources
+├── ClearSpend.xcodeproj/      # Xcode project file
+├── docs/                      # Documentation
+│   ├── ARCHITECTURE.md        # System architecture
+│   ├── API.md                 # API documentation
+│   └── config.env.example     # Environment template
+├── scripts/                   # Utility scripts
+│   ├── setup.sh              # Project setup script
+│   ├── start_backend.py      # Backend startup script
+│   ├── test_integration.py   # Integration tests
+│   ├── demo_backend_integration.py # Demo script
+│   └── utilities/            # Utility scripts
+│       ├── create_clearspend_asa.py
+│       └── generate_testnet_wallet.py
+├── Makefile                   # Build automation
+├── .gitignore                 # Git ignore rules
+└── requirements.txt           # Python dependencies
+```
+
+## Getting Started
 
 ### Prerequisites
 - Python 3.11+
-- Xcode 15+ (for iOS app)
-- AlgoKit (`pipx install algokit`)
-- Funded Algorand TestNet account
+- Xcode 15+
+- iOS 17+
+- Algorand Testnet account
+- AlgoKit installed (`pipx install algokit`)
 
-### Quick Demo Setup
+### Quick Setup
 ```bash
 # Clone repository
-git clone https://github.com/magsss17/clear-spend.git
+git clone https://github.com/yourteam/clearspend.git
 cd clear-spend
 
+# Run automated setup
+./scripts/setup.sh
+
+# Start the backend
+make backend
+```
+
+### Manual Setup
+```bash
 # Install dependencies
 make install
 
-# Start backend API
-make backend
+# Configure environment
+cp docs/config.env.example docs/config.env
+# Edit docs/config.env with your Algorand credentials
 
-# Open iOS app in Xcode
-open ClearSpend.xcodeproj
-# Build and run on iPhone simulator
+# Deploy smart contracts
+make deploy
+
+# Start the backend API
+make backend
 ```
 
-### Live Demo Flow
-1. **Backend API** → Running on `http://localhost:8000`
-2. **Smart Contracts** → Deployed to Algorand TestNet
-3. **iOS App** → Connected to real blockchain
-4. **Make Purchase** → Watch atomic transactions on explorer
-5. **Real Verification** → Smart contracts validate every purchase
+### iOS App Setup
+```bash
+# Open in Xcode
+open ClearSpend.xcodeproj
 
----
+# Build and run on simulator
+make ios
+```
 
-## Demo Results & Proof of Concept
+### Available Commands
+```bash
+make help          # Show all available commands
+make install       # Install dependencies
+make backend       # Start backend API
+make ios          # Build iOS app (requires Xcode)
+make test         # Run all tests
+make deploy       # Deploy smart contracts
+make docker       # Run with Docker Compose
+make clean        # Clean temporary files
+```
 
-### Successful Testnet Transactions
-- **Smart Contract Deployment**: Both contracts deployed to TestNet
-- **Atomic Purchase Groups**: 3-transaction groups executing successfully  
-- **Box Storage**: Merchant attestations stored and retrieved on-chain
-- **Real iOS Integration**: App making actual blockchain transactions
-- **End-to-End Flow**: Teen purchase → Verification → Payment → Confirmation
+## Demo Flow
 
-### Performance Metrics
-- **Transaction Confirmation**: ~3.3 seconds (Algorand standard)
-- **API Response Time**: <200ms for purchase verification
-- **Smart Contract Execution**: <100ms for attestation lookup
-- **iOS App Responsiveness**: Real-time balance updates
+### Backend API Flow
+1. **Start Backend** → API running on `http://localhost:8000`
+2. **Deploy Contracts** → Smart contracts deployed to Algorand Testnet
+3. **Add Merchants** → Oracle service manages merchant attestations
+4. **Verify Purchases** → Real-time purchase verification via API
+5. **Execute Transactions** → Atomic transfer groups for secure purchases
 
----
+### iOS App Flow
+![Learn Interface](docs/images/learn-bottom.png)
 
-## Technical Video Walkthrough
+1. **Teen opens app** → Sees $1000 allowance (10 ALGO at $100/ALGO rate)
+2. **Initiates purchase** → Selects merchant and amount
+3. **API Verification** → Backend verifies purchase via atomic transfers
+4. **Approved purchases** → Instant confirmation with explorer link
+5. **Rejected purchases** → Clear feedback on restrictions
+6. **Learning rewards** → Earn XP for financial education
 
-### What You'll See in Our Technical Video:
+## Why We Win
 
-#### 1. **Smart Contract Deep Dive** (2 minutes)
-- Live code walkthrough of custom attestation oracle
-- Box storage implementation for merchant data
-- Atomic transaction group structure
-- Deployment process on TestNet
+### Innovation
+- First teen finance app with **pre-purchase blockchain verification**
+- Novel use of atomic transfers for parental controls
 
-#### 2. **iOS App Architecture** (2 minutes)
-- SwiftUI interface design
-- AlgorandService integration
-- Real blockchain transaction flow
-- Purple/white UI addressing contrast issues
+### Algorand Utilization
+- Leverages unique Algorand features:
+  - Atomic transfers for trustless verification
+  - Box storage for scalable attestations
+  - Low fees enabling micro-transactions
 
-#### 3. **Backend Integration** (2 minutes)
-- FastAPI service architecture
-- Blockchain service implementation
-- Real-time purchase verification
-- Database and caching layer
+### Impact
+- Addresses real need for teen financial education
+- Builds on-chain credit history from young age
+- Reduces financial fraud and overspending
 
-#### 4. **Live Demo** (3 minutes)
-- Teen making actual purchase
-- Smart contract verification process
-- Transaction appearing on TestNet explorer
-- Parent approval workflow
-
-#### 5. **Repository Structure** (1 minute)
-- Open source codebase tour
-- Documentation and setup guides
-- Testing and deployment scripts
-
----
-
-## Key Features & Innovation
-
-### Technical Innovation
-- **First teen finance app** with pre-purchase blockchain verification
-- **Novel atomic transfer usage** for parental controls
-- **Box storage optimization** for scalable merchant attestations
-
-### Real-World Impact
-- Addresses teen financial literacy challenges
-- Builds financial literacy from young age
-- Creates verifiable credit history on blockchain
-
-### Production Readiness
-- Complete full-stack implementation
-- Docker deployment ready
-- Comprehensive testing suite
-- Clear scaling architecture
-
----
+### Feasibility
+- Working MVP in 36 hours
+- Clear path to production
+- Minimal infrastructure requirements
 
 ## Team
 
-**ClearSpend Team** - Building the future of teen finance on Algorand
+**Ellis Osborn** - Wharton '26, founder of Fitcentive
 
-*Passionate developers committed to financial literacy and blockchain innovation*
+**Maggie Schwierking** - Wharton & CS '26
 
----
+## License
 
-## Open Source License
+MIT License - Open source for the community
 
-**MIT License** - This project is and will remain fully open source for the community.
+## Links
 
-```
-Copyright (c) 2025 ClearSpend Team
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-```
+- [Demo Video](https://drive.google.com/file/d/1uYmhTeyYJPIr0KVKu4QANZ0HwwCpz-8X/view?usp=sharing)
+- [Full Project Walkthrough](https://drive.google.com/file/d/1AM0P9OGZea-J7We3JQHX2HNeu7gMYE4V/view?usp=sharing)
+- [Presentation Slides](https://www.canva.com/design/DAGyRYsD7ss/fk-b71lykyxVjLpjrMdjrg/edit?utm_content=DAGyRYsD7ss&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
+- [Algorand Explorer](https://testnet.algoexplorer.io)
 
 ---
 
-## Links & Resources
-
-- **[Demo Video](https://youtu.be/YOUR_DEMO_VIDEO_ID)** - App functionality showcase
-- **[Technical Video](https://youtu.be/YOUR_TECHNICAL_VIDEO_ID)** - Code walkthrough with audio
-- **[Canva Slides](https://canva.com/YOUR_PRESENTATION_LINK)** - Hackathon presentation
-- **[TestNet Explorer](https://testnet.algoexplorer.io)** - View live transactions
-- **[API Documentation](docs/API.md)** - Backend API reference
-- **[Architecture Guide](docs/ARCHITECTURE.md)** - System design details
-
----
-
-## Future Roadmap
-
-### Phase 2: Enhanced Features (Q2 2025)
-- Multi-signature family wallets
-- DeFi yield integration for savings
-- Credit score NFTs with verifiable history
-- Merchant partnership program
-
-### Phase 3: Scale & Adoption (Q3-Q4 2025)
-- Parent management web portal
-- School district partnerships
-- Real prepaid card integration
-- Cross-chain reputation system
-
----
-
-*ClearSpend: Where blockchain meets financial education*
+Built at Algorand x EasyA Harvard Hackathon 2025
