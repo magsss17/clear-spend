@@ -64,8 +64,14 @@ struct HomeView: View {
             }
             
             HStack(alignment: .bottom, spacing: 8) {
-                Text("\(walletViewModel.formattedBalanceWithDollar)")
-                    .font(.system(size: 42, weight: .bold, design: .rounded))
+                if algorandService.isLoadingBalance {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle())
+                        .scaleEffect(1.5)
+                } else {
+                    Text("\(walletViewModel.formattedBalanceWithDollar)")
+                        .font(.system(size: 42, weight: .bold, design: .rounded))
+                }
             }
         }
         .frame(maxWidth: .infinity)

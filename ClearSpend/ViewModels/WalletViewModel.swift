@@ -15,6 +15,7 @@ class WalletViewModel: ObservableObject {
     @Published var goodSpendingStreak: Int = 12
     
     private var algorandService: AlgorandService?
+    private var cancellables = Set<AnyCancellable>()
     
     var formattedBalance: String {
         String(format: "%.2f", asaBalance)
@@ -110,6 +111,31 @@ class WalletViewModel: ObservableObject {
     
     func subtractFromBalance(_ amount: Double) {
         asaBalance = max(0, asaBalance - amount)
+    }
+    
+    func addTransaction(_ result: PurchaseResult, merchant: String, category: String, amount: Double) {
+        let newTransaction = Transaction(
+            id: result.transactionId ?? UUID().uuidString,
+            merchant: merchant,
+            category: category,
+            amount: amount,
+            date: Date(),
+            status: result.success ? .approved : .rejected,
+            transactionHash: result.transactionId,
+            note: result.success ? "Purchase completed" : result.message,
+            purchaseJustification: .necessity,
+            merchantReputationScore: 8.5,
+            spendingIntegrityScore: spendingIntegrityScore,
+            verificationProofs: []
+        )
+        
+        // Add to beginning of recent transactions
+        recentTransactions.insert(newTransaction, at: 0)
+        
+        // Keep only the most recent 20 transactions
+        if recentTransactions.count > 20 {
+            recentTransactions.removeLast()
+        }
     }
     
     func loadTransactionHistory() async {

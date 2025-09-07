@@ -25,46 +25,56 @@ struct TransactionRowView: View {
     }
     
     var body: some View {
-        HStack(spacing: 12) {
-            Image(systemName: categoryIcon)
-                .font(.title3)
-                .foregroundColor(.purple)
-                .frame(width: 40, height: 40)
-                .background(Color.purple.opacity(0.1))
-                .cornerRadius(8)
-            
-            VStack(alignment: .leading, spacing: 4) {
-                Text(transaction.merchant)
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                
-                Text(transaction.category)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                
-                Text(transaction.formattedDate)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+        Button(action: {
+            if let explorerLink = transaction.explorerLink {
+                if let url = URL(string: explorerLink) {
+                    UIApplication.shared.open(url)
+                }
             }
-            
-            Spacer()
-            
-            VStack(alignment: .trailing, spacing: 4) {
-                Text("-\(transaction.formattedAmount)")
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(transaction.status == .rejected ? .secondary : .primary)
+        }) {
+            HStack(spacing: 12) {
+                Image(systemName: categoryIcon)
+                    .font(.title3)
+                    .foregroundColor(.purple)
+                    .frame(width: 40, height: 40)
+                    .background(Color.purple.opacity(0.1))
+                    .cornerRadius(8)
                 
-                Text(transaction.status.rawValue)
-                    .font(.caption2)
-                    .fontWeight(.medium)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 2)
-                    .background(statusColor.opacity(0.1))
-                    .foregroundColor(statusColor)
-                    .cornerRadius(10)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(transaction.merchant)
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                        .foregroundColor(.primary)
+                    
+                    Text(transaction.category)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    
+                    Text(transaction.formattedDate)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                
+                Spacer()
+                
+                VStack(alignment: .trailing, spacing: 4) {
+                    Text("-\(transaction.formattedAmount)")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(transaction.status == .rejected ? .secondary : .primary)
+                    
+                    Text(transaction.status.rawValue)
+                        .font(.caption2)
+                        .fontWeight(.medium)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 2)
+                        .background(statusColor.opacity(0.1))
+                        .foregroundColor(statusColor)
+                        .cornerRadius(10)
+                }
             }
         }
+        .buttonStyle(PlainButtonStyle())
         .padding(.vertical, 8)
     }
 }

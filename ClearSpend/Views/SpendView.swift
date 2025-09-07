@@ -66,8 +66,14 @@ struct SpendView: View {
             }
             
             HStack(alignment: .bottom, spacing: 8) {
-                Text("\(walletViewModel.formattedBalanceWithDollar)")
-                    .font(.system(size: 42, weight: .bold, design: .rounded))
+                if algorandService.isLoadingBalance {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle())
+                        .scaleEffect(1.5)
+                } else {
+                    Text("\(walletViewModel.formattedBalanceWithDollar)")
+                        .font(.system(size: 42, weight: .bold, design: .rounded))
+                }
             }
         }
         .frame(maxWidth: .infinity)
@@ -346,16 +352,21 @@ struct SpendView: View {
         isProcessing = true
         
         Task {
+            let purchaseAmount = Double(amount) ?? 0
             let result = await algorandService.processPurchase(
                 merchant: merchantName,
-                amount: Double(amount) ?? 0,
+                amount: purchaseAmount,
                 category: category
             )
             
             await MainActor.run {
                 purchaseResult = result
                 isProcessing = false
+                
                 if result.success {
+                    // Add transaction to recent activity
+                    walletViewModel.addTransaction(result, merchant: merchantName, category: category, amount: purchaseAmount)
+                    
                     clearForm()
                     Task {
                         await walletViewModel.refreshBalance()

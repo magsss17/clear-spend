@@ -33,7 +33,7 @@ struct Transaction: Identifiable, Codable {
     
     var explorerLink: String? {
         guard let hash = transactionHash else { return nil }
-        return "https://testnet.algoexplorer.io/tx/\(hash)"
+        return "https://lora.algokit.io/testnet/transaction/\(hash)"
     }
 }
 

@@ -28,7 +28,7 @@ struct InvestView: View {
             HStack(spacing: 16) {
                 PortfolioCard(
                     title: "Balance",
-                    amount: "\(walletViewModel.formattedBalanceWithDollar)",
+                    amount: algorandService.isLoadingBalance ? "Loading..." : "\(walletViewModel.formattedBalanceWithDollar)",
                     percentage: "+5.2%",
                     icon: "banknote",
                     color: .green
