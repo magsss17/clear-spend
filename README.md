@@ -1,6 +1,6 @@
 # ClearSpend - Teen Financial Literacy on Algorand
 
-## Algorand x EasyA Harvard Hackathon Submission
+## Algorand x EasyA Harvard Hackathon (WINNERS $10k)
 
 ClearSpend is a blockchain-powered teen spending app that teaches financial responsibility through verifiable, parent-controlled digital allowances on Algorand.
 
