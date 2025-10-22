@@ -73,21 +73,57 @@ struct AlgodClient {
     }
     
     func submitTransaction(_ transaction: SignedTransaction) async throws -> String {
-        // Make real HTTP request to submit transaction to testnet
-        let url = URL(string: "\(host)/v2/transactions")!
+        // This mock method is not used for real transactions
+        // Real transactions are submitted via submitRealTransaction
+        throw AlgorandError.transactionSubmissionFailed
+    }
+
+    func submitRealTransaction(amount: Double, merchant: String, category: String) async throws -> String {
+        // Call local transaction service to submit real transaction to testnet
+        let url = URL(string: "http://localhost:3000/submit-transaction")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.setValue("application/x-binary", forHTTPHeaderField: "Content-Type")
-        
-        // Real testnet transaction IDs created on 2025-09-07
-        let txId = [
-            "R4S437SWZTH2TGHJAFMKFIDOY4UJKPGJPNSO2OCV22GWSG4NTODA", // Khan Academy
-            "M3CTWNZ37UFZ4ISWHDGUSLJFPZLIEJ4KGOKFPP6BYBHQCWTGYMVA", // Community Charity
-            "2XXPMJ4P227GR5YX5TOJPII45JJ67WBCM4KTTDOKLTLDYAWJS3NQ", // Amazon
-            "PXUHIF3M7AA6ONMTBNRMATVEFWTFGQMHDKYRMAD5GI2GZLZJ62QQ"
-        ].randomElement()!
-        print("📤 Real testnet transaction submitted: \(txId)")
-        return txId
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        // Create request body
+        let requestBody: [String: Any] = [
+            "amount": amount,
+            "merchant": merchant,
+            "category": category
+        ]
+
+        request.httpBody = try JSONSerialization.data(withJSONObject: requestBody)
+
+        print("📤 Submitting real transaction to testnet...")
+        print("   Amount: $\(amount)")
+        print("   Merchant: \(merchant)")
+        print("   Category: \(category)")
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw AlgorandError.networkError
+        }
+
+        if httpResponse.statusCode == 200 {
+            // Parse response
+            if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let success = json["success"] as? Bool,
+               success,
+               let txId = json["transactionId"] as? String {
+                print("✅ Transaction submitted: \(txId)")
+                return txId
+            } else {
+                throw AlgorandError.invalidResponse
+            }
+        } else {
+            // Handle error response
+            if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let error = json["error"] as? String {
+                print("❌ Transaction service error: \(error)")
+            }
+            throw AlgorandError.transactionSubmissionFailed
+        }
     }
     
     func submitTransactionGroup(_ transactions: [SignedTransaction]) async throws -> String {
@@ -129,7 +165,7 @@ struct Account {
     }
     
     static func fromMnemonic(_ mnemonic: String) throws -> Account {
-        return Account(address: Address(description: "UYN4IOH5G2HRKRITQVDDE4IAIZZ4NHGR3GQZSWFYGOIUGZFB2RCCZKNWGQ"))
+        return Account(address: Address(description: "N2DF4O5OX7B5EVF4KZ7ZOKR5ZIVEB2YHSTHMO4YHMMLZQO5CFYE2TFH5PM"))
     }
     
     func sign(_ transaction: any TransactionProtocol) throws -> SignedTransaction {
@@ -287,8 +323,34 @@ class AlgorandService: ObservableObject {
     @Published var isConnected = false
     @Published var currentAddress: String?
     @Published var balance: Double = 0
-    @Published var asaBalance: Double = 150.0 // ClearSpend Dollar balance
-    @Published var transactions: [TransactionResult] = []
+    @Published var asaBalance: Double = 583.98 // ClearSpend Dollar balance
+    @Published var transactions: [TransactionResult] = [
+        // Prefilled historical transactions with real testnet IDs
+        TransactionResult(
+            id: "ROSPYKASZEB764CBJ73TJN2J5DL6WAMAAXDUW7RE2XUYZL4AVEBA",
+            merchant: "Spotify",
+            amount: 15.0,  // $15 = 0.15 ALGO sent
+            category: "Entertainment",
+            timestamp: Date().addingTimeInterval(-86400 * 3), // 3 days ago
+            isApproved: true
+        ),
+        TransactionResult(
+            id: "MWG2QKAMGCXN5MTY3CMBQHKPG6RZN2U4IRUSACIIN24MJUUI2PAQ",
+            merchant: "Khan Academy",
+            amount: 25.0,  // $25 = 0.25 ALGO sent
+            category: "Education",
+            timestamp: Date().addingTimeInterval(-86400 * 2), // 2 days ago
+            isApproved: true
+        ),
+        TransactionResult(
+            id: "5UPM6NTVJEQFIVSQSQD4MDWL4N3ZEHK33GT64LMBXYHSH5AUNY2A",
+            merchant: "Amazon",
+            amount: 35.0,  // $35 = 0.35 ALGO sent
+            category: "Shopping",
+            timestamp: Date().addingTimeInterval(-86400), // 1 day ago
+            isApproved: true
+        )
+    ]
     
     private var algodClient: AlgodClient
     private var indexerClient: IndexerClient
@@ -310,8 +372,11 @@ class AlgorandService: ObservableObject {
     // Credit Score NFT ID (LIVE on testnet!)
     private let creditScoreNftId: UInt64 = 745477123
     
-    // Production wallet address for transactions (real testnet wallet with actual transactions)
-    private let walletAddress = "UYN4IOH5G2HRKRITQVDDE4IAIZZ4NHGR3GQZSWFYGOIUGZFB2RCCZKNWGQ"
+    // User wallet (Wallet 1) - sends transactions
+    private let userWalletAddress = "N2DF4O5OX7B5EVF4KZ7ZOKR5ZIVEB2YHSTHMO4YHMMLZQO5CFYE2TFH5PM"
+
+    // Merchant wallet (Wallet 2) - receives transactions
+    private let merchantWalletAddress = "TQYQO4K3SK7R4FALKPEGZJMGG44ZOD25W5JATCNCKF7RCNF4FFJDLEP57I"
     
     init() {
         // Initialize Algorand clients
@@ -325,7 +390,7 @@ class AlgorandService: ObservableObject {
     
     private func setupTestnetWallet() async {
         // Create account using the specified wallet address
-        account = Account(address: Address(description: walletAddress))
+        account = Account(address: Address(description: userWalletAddress))
         currentAddress = account?.address.description
         
         // Get account info and balance
@@ -410,18 +475,13 @@ class AlgorandService: ObservableObject {
                 )
             }
             
-            // Step 2: Build atomic transaction group
-            let txGroup = try await buildPurchaseTransactionGroup(
-                merchant: merchant,
+            // Step 2: Submit real transaction to testnet
+            // Sends amount/100 in ALGO from wallet 1 to wallet 2
+            let txId = try await algodClient.submitRealTransaction(
                 amount: amount,
+                merchant: merchant,
                 category: category
             )
-            
-            // Step 3: Submit atomic group to network
-            let txId = try await algodClient.submitTransactionGroup(txGroup)
-            
-            // Step 4: Wait for confirmation
-            try await waitForConfirmation(txId: txId)
             
             // Add to transaction history
             let transaction = TransactionResult(
@@ -434,26 +494,27 @@ class AlgorandService: ObservableObject {
             )
             transactions.insert(transaction, at: 0)
             
-            print("✅ ATOMIC TRANSFER SUCCESS - Transaction Group: \(txId)")
+            print("✅ REAL TRANSACTION SUCCESS - TX ID: \(txId)")
             print("🔗 Explorer: https://lora.algokit.io/testnet/transaction/\(txId)")
-            
+            print("💰 Sent: \(amount / 100) ALGO from wallet 1 to wallet 2")
+
             // Update local balance after successful transaction
             await MainActor.run {
                 asaBalance = max(0, asaBalance - amount)
             }
-            
+
             return PurchaseResult(
                 success: true,
-                message: "✅ Purchase verified & approved!\n🔗 Atomic transfer confirmed on Algorand testnet\n🛡️ Fraud prevention: PASSED\n🎓 Smart spending decision increases your credit score!",
+                message: "Purchase verified & approved!",
                 transactionId: txId,
                 explorerLink: "https://lora.algokit.io/testnet/transaction/\(txId)"
             )
             
         } catch {
-            print("❌ ATOMIC TRANSFER FAILED: \(error)")
+            print("❌ TRANSACTION FAILED: \(error)")
             return PurchaseResult(
                 success: false,
-                message: "❌ Transaction failed: \(error.localizedDescription)\n\nThis demonstrates how atomic transfers prevent partial payments when verification fails.",
+                message: "❌ Transaction failed: \(error.localizedDescription)\n\nMake sure the transaction service is running:\nnode transaction-service.js",
                 transactionId: nil,
                 explorerLink: nil
             )
@@ -479,60 +540,62 @@ class AlgorandService: ObservableObject {
             let algoAmount = Double(accountInfo.amount) / 1_000_000 // Convert microAlgos to Algos
             balance = min(algoAmount, 500.0) // Cap at 500 ALGO as requested
             
-            // Convert ALGO to USD for display (using realistic rate of ~$0.20 per ALGO)
-            let usdValue = algoAmount * 0.20
-            asaBalance = usdValue // Display as USD equivalent
-            
-            print("✅ Real ALGO balance fetched: \(algoAmount) ALGO (displayed: $\(usdValue) USD)")
+            // Don't override asaBalance - keep demo balance of $583
+            // let usdValue = algoAmount * 0.20
+            // asaBalance = usdValue // Display as USD equivalent
+
+            print("✅ Real ALGO balance fetched: \(algoAmount) ALGO")
+            print("💰 Using demo balance: $\(asaBalance)")
             print("🔗 Explorer: https://lora.algokit.io/testnet/account/\(account.address.description)")
-            
-            // Get ASA balance (ClearSpend Dollars) - but use realistic amount for demo
-            if clearSpendAsaId > 0 {
-                if let assetInfo = accountInfo.assets.first(where: { $0.assetId == clearSpendAsaId }) {
-                    let rawAssetBalance = Double(assetInfo.amount) / 100 // Assuming 2 decimal places
-                    // Use realistic balance instead of the large demo amount
-                    let realisticBalance = min(rawAssetBalance, 150.0) // Cap at $150 for realistic demo with spending room
-                    asaBalance = realisticBalance
-                    print("✅ Real ClearSpend Dollar balance found: \(rawAssetBalance) CSD, using realistic demo amount: $\(realisticBalance)")
-                } else {
-                    print("⚠️ ClearSpend Dollar asset not found, using ALGO->USD conversion: $\(usdValue)")
-                }
-            }
+
+            // Keep the demo balance of $583 instead of fetching real balance
             
         } catch {
             print("❌ Error fetching real balance, using demo values: \(error)")
             print("❌ Error details: \(error.localizedDescription)")
             // Fallback to demo values if real API fails
             balance = 10.0  // 10 ALGO demo balance
-            asaBalance = 2.00  // $2.00 demo balance (realistic amount)
+            // Keep asaBalance at $583 (don't override)
         }
     }
     
     private func checkPurchaseApproval(category: String, amount: Double, merchant: String) async -> Bool {
-        let restrictedCategories = ["Gaming", "Gambling"]
+        let restrictedCategories = ["Gaming", "Gambling", "Adult Content"]
         let fraudulentMerchants = ["ShadyDealsOnline", "FakeGameStore", "UnverifiedShop"]
-        let dailyLimit: Double = 500.0 // Increased to 500 as per user request
-        
+
+        // Blocked keywords in merchant names (case-insensitive)
+        let blockedKeywords = ["drugs", "gambling", "gaming", "adult content", "casino", "poker", "bet"]
+        let dailyLimit: Double = 500.0
+
         print("🔍 ADVANCED FRAUD PREVENTION CHECK:")
         print("   Merchant: \(merchant)")
         print("   Category: \(category)")
         print("   Amount: $\(String(format: "%.2f", amount))")
-        
+
+        // Check merchant name for blocked keywords
+        let merchantLower = merchant.lowercased()
+        for keyword in blockedKeywords {
+            if merchantLower.contains(keyword) {
+                print("   ❌ BLOCKED: Merchant name contains restricted keyword '\(keyword)'")
+                return false
+            }
+        }
+
         // Advanced fraud detection algorithms
         let fraudScore = await calculateFraudRiskScore(merchant: merchant, amount: amount, category: category)
         print("   🤖 AI Fraud Risk Score: \(String(format: "%.2f", fraudScore))/10.0")
-        
+
         if fraudScore >= 9.5 {
             print("   ❌ BLOCKED: High fraud risk score (\(String(format: "%.2f", fraudScore)))")
             return false
         }
-        
+
         // Behavioral pattern analysis
         if await detectSuspiciousSpendingPattern(amount: amount, merchant: merchant) {
             print("   ❌ BLOCKED: Suspicious spending pattern detected")
             return false
         }
-        
+
         // Merchant reputation verification
         let merchantRep = getMerchantReputation(merchant: merchant)
         print("   🏪 Merchant reputation: \(String(format: "%.1f", merchantRep))/10.0")
@@ -540,12 +603,12 @@ class AlgorandService: ObservableObject {
             print("   ❌ BLOCKED: Low merchant reputation (\(String(format: "%.1f", merchantRep)))")
             return false
         }
-        
+
         if fraudulentMerchants.contains(merchant) {
             print("   ❌ BLOCKED: Merchant on fraud blacklist")
             return false
         }
-        
+
         if restrictedCategories.contains(category) {
             print("   ❌ BLOCKED: Restricted category")
             return false

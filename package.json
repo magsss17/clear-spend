@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/magsss17/clear-spend#readme",
   "dependencies": {
-    "algosdk": "^3.4.0",
+    "algosdk": "^2.9.0",
     "cors": "^2.8.5",
     "express": "^5.1.0"
   }
