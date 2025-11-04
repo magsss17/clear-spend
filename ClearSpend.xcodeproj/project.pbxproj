@@ -20,10 +20,12 @@
 		C5A1B11A1D4B2C9700123456 /* TransactionHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A1B1191D4B2C9700123456 /* TransactionHistoryView.swift */; };
 		C5A1B11C1D4B2C9F00123456 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A1B11B1D4B2C9F00123456 /* SettingsView.swift */; };
 		C5A1B11E1D4B2CA700123456 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A1B11D1D4B2CA700123456 /* Transaction.swift */; };
-		C5A1B1261D4B2CC700123456 /* ApprovedMerchant.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A1B1251D4B2CC700123456 /* ApprovedMerchant.swift */; };
 		C5A1B1201D4B2CAF00123456 /* AlgorandService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A1B11F1D4B2CAF00123456 /* AlgorandService.swift */; };
 		C5A1B1221D4B2CB700123456 /* WalletViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A1B1211D4B2CB700123456 /* WalletViewModel.swift */; };
 		C5A1B1241D4B2CBF00123456 /* ParentControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A1B1231D4B2CBF00123456 /* ParentControlView.swift */; };
+		C5A1B1261D4B2CC700123456 /* ApprovedMerchant.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A1B1251D4B2CC700123456 /* ApprovedMerchant.swift */; };
+		C5A1B1271D4B2CD000123456 /* CreditJourneyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A1B1281D4B2CD000123456 /* CreditJourneyView.swift */; };
+		C5A1B1291D4B2CD100123456 /* CreditBreakdown.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A1B12A1D4B2CD100123456 /* CreditBreakdown.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,10 +43,12 @@
 		C5A1B1191D4B2C9700123456 /* TransactionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionHistoryView.swift; sourceTree = "<group>"; };
 		C5A1B11B1D4B2C9F00123456 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		C5A1B11D1D4B2CA700123456 /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
-		C5A1B1251D4B2CC700123456 /* ApprovedMerchant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApprovedMerchant.swift; sourceTree = "<group>"; };
 		C5A1B11F1D4B2CAF00123456 /* AlgorandService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgorandService.swift; sourceTree = "<group>"; };
 		C5A1B1211D4B2CB700123456 /* WalletViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletViewModel.swift; sourceTree = "<group>"; };
 		C5A1B1231D4B2CBF00123456 /* ParentControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParentControlView.swift; sourceTree = "<group>"; };
+		C5A1B1251D4B2CC700123456 /* ApprovedMerchant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApprovedMerchant.swift; sourceTree = "<group>"; };
+		C5A1B1281D4B2CD000123456 /* CreditJourneyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditJourneyView.swift; sourceTree = "<group>"; };
+		C5A1B12A1D4B2CD100123456 /* CreditBreakdown.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditBreakdown.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -109,6 +113,7 @@
 				C5A1B1191D4B2C9700123456 /* TransactionHistoryView.swift */,
 				C5A1B11B1D4B2C9F00123456 /* SettingsView.swift */,
 				C5A1B1231D4B2CBF00123456 /* ParentControlView.swift */,
+				C5A1B1281D4B2CD000123456 /* CreditJourneyView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -118,6 +123,7 @@
 			children = (
 				C5A1B11D1D4B2CA700123456 /* Transaction.swift */,
 				C5A1B1251D4B2CC700123456 /* ApprovedMerchant.swift */,
+				C5A1B12A1D4B2CD100123456 /* CreditBreakdown.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -166,7 +172,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1500;
-				LastUpgradeCheck = 1640;
+				LastUpgradeCheck = 2610;
 				TargetAttributes = {
 					C5A1B0FB1D4B2C3A00123456 = {
 						CreatedOnToolsVersion = 15.0;
@@ -223,6 +229,8 @@
 				C5A1B1201D4B2CAF00123456 /* AlgorandService.swift in Sources */,
 				C5A1B1221D4B2CB700123456 /* WalletViewModel.swift in Sources */,
 				C5A1B1241D4B2CBF00123456 /* ParentControlView.swift in Sources */,
+				C5A1B1271D4B2CD000123456 /* CreditJourneyView.swift in Sources */,
+				C5A1B1291D4B2CD100123456 /* CreditBreakdown.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -264,6 +272,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 6K653PRL57;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -287,6 +296,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -327,6 +337,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 6K653PRL57;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -343,6 +354,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -358,7 +370,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"ClearSpend/Preview Content\"";
-				DEVELOPMENT_TEAM = 6K653PRL57;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -390,7 +401,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"ClearSpend/Preview Content\"";
-				DEVELOPMENT_TEAM = 6K653PRL57;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

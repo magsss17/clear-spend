@@ -1,0 +1,224 @@
+{
+  "currentScore": 742,
+  "scoreRange": {
+    "min": 300,
+    "max": 850
+  },
+  "scoreLevel": "Excellent",
+  "scoreColor": "#10b981",
+  "breakdown": {
+    "spendingConsistency": {
+      "score": 85,
+      "maxScore": 100,
+      "weight": 35,
+      "description": "Consistency in spending patterns and responsible purchase behavior",
+      "details": [
+        {
+          "factor": "Regular purchases",
+          "value": "23 verified purchases",
+          "impact": "positive"
+        },
+        {
+          "factor": "Spending streak",
+          "value": "3 weeks consistent",
+          "impact": "positive"
+        },
+        {
+          "factor": "No overspending",
+          "value": "0 instances",
+          "impact": "positive"
+        }
+      ]
+    },
+    "savingsRate": {
+      "score": 72,
+      "maxScore": 100,
+      "weight": 30,
+      "description": "Percentage of allowance saved versus spent",
+      "details": [
+        {
+          "factor": "Monthly savings",
+          "value": "28% of allowance",
+          "impact": "positive"
+        },
+        {
+          "factor": "Round-up savings",
+          "value": "1 completed",
+          "impact": "positive"
+        },
+        {
+          "factor": "Emergency fund",
+          "value": "$45 saved",
+          "impact": "positive"
+        }
+      ]
+    },
+    "merchantDiversity": {
+      "score": 78,
+      "maxScore": 100,
+      "weight": 25,
+      "description": "Variety of merchants and responsible category spending",
+      "details": [
+        {
+          "factor": "Merchants used",
+          "value": "12 different merchants",
+          "impact": "positive"
+        },
+        {
+          "factor": "Category diversity",
+          "value": "5 categories",
+          "impact": "positive"
+        },
+        {
+          "factor": "High-reputation merchants",
+          "value": "85% of purchases",
+          "impact": "positive"
+        }
+      ]
+    },
+    "financialEducation": {
+      "score": 90,
+      "maxScore": 100,
+      "weight": 10,
+      "description": "Engagement with financial literacy modules",
+      "details": [
+        {
+          "factor": "Modules completed",
+          "value": "4 of 5 modules",
+          "impact": "positive"
+        },
+        {
+          "factor": "XP earned",
+          "value": "350 XP",
+          "impact": "positive"
+        },
+        {
+          "factor": "Learning streak",
+          "value": "7 days",
+          "impact": "positive"
+        }
+      ]
+    }
+  },
+  "milestones": [
+    {
+      "id": "first_roundup",
+      "title": "First Round-Up Savings",
+      "description": "Completed your first round-up savings transaction",
+      "icon": "💾",
+      "achieved": true,
+      "achievedDate": "2025-01-15",
+      "points": 25
+    },
+    {
+      "id": "three_weeks_responsible",
+      "title": "3 Weeks of Responsible Spending",
+      "description": "Maintained consistent spending for 3 consecutive weeks",
+      "icon": "🔥",
+      "achieved": true,
+      "achievedDate": "2025-01-20",
+      "points": 50
+    },
+    {
+      "id": "five_merchants",
+      "title": "Diverse Shopping",
+      "description": "Made purchases from 5 different merchants",
+      "icon": "🏪",
+      "achieved": true,
+      "achievedDate": "2025-01-10",
+      "points": 30
+    },
+    {
+      "id": "ten_merchants",
+      "title": "Merchant Explorer",
+      "description": "Explore 10 different merchants",
+      "icon": "🌍",
+      "achieved": false,
+      "progress": 12,
+      "target": 10,
+      "points": 50
+    },
+    {
+      "id": "four_weeks_responsible",
+      "title": "Monthly Champion",
+      "description": "4 weeks of consistent responsible spending",
+      "icon": "⭐",
+      "achieved": false,
+      "progress": 3,
+      "target": 4,
+      "points": 75
+    },
+    {
+      "id": "score_750",
+      "title": "Credit Elite",
+      "description": "Reach a credit score of 750+",
+      "icon": "🏆",
+      "achieved": false,
+      "progress": 742,
+      "target": 750,
+      "points": 100
+    },
+    {
+      "id": "save_100",
+      "title": "Century Saver",
+      "description": "Save $100 in your emergency fund",
+      "icon": "💰",
+      "achieved": false,
+      "progress": 45,
+      "target": 100,
+      "points": 75
+    }
+  ],
+  "recentActivity": [
+    {
+      "date": "2025-01-22",
+      "action": "Credit score increased",
+      "change": "+5 points",
+      "reason": "Completed 3 weeks of responsible spending milestone"
+    },
+    {
+      "date": "2025-01-20",
+      "action": "Milestone achieved",
+      "change": "+50 points",
+      "reason": "3 Weeks of Responsible Spending"
+    },
+    {
+      "date": "2025-01-18",
+      "action": "Credit score increased",
+      "change": "+3 points",
+      "reason": "Increased savings rate to 28%"
+    },
+    {
+      "date": "2025-01-15",
+      "action": "Milestone achieved",
+      "change": "+25 points",
+      "reason": "First Round-Up Savings completed"
+    }
+  ],
+  "parentInsights": {
+    "enabled": false,
+    "insights": [
+      {
+        "category": "Spending Patterns",
+        "insight": "Your teen shows consistent spending across approved categories. No unauthorized purchases detected.",
+        "recommendation": "Consider encouraging exploration of educational merchants to boost credit score."
+      },
+      {
+        "category": "Savings Behavior",
+        "insight": "Savings rate has improved from 20% to 28% over the past month. Round-up feature is engaging.",
+        "recommendation": "Set a savings goal milestone to maintain motivation."
+      },
+      {
+        "category": "Merchant Diversity",
+        "insight": "Good diversity with 12 merchants across 5 categories. High-reputation merchant usage is excellent.",
+        "recommendation": "Continue exploring new approved merchants to boost diversity score."
+      },
+      {
+        "category": "Financial Education",
+        "insight": "Strong engagement with learning modules. 7-day learning streak shows commitment.",
+        "recommendation": "Complete remaining modules to unlock full credit score potential."
+      }
+    ]
+  }
+}
+

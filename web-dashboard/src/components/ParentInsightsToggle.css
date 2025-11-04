@@ -1,0 +1,136 @@
+.parent-insights-toggle {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  position: sticky;
+  top: 2rem;
+}
+
+.toggle-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.toggle-header h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 52px;
+  height: 28px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #e5e5e7;
+  transition: 0.3s;
+  border-radius: 28px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 22px;
+  width: 22px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-switch input:checked + .toggle-slider {
+  background-color: #8b5cf6;
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+  transform: translateX(24px);
+}
+
+.toggle-description {
+  font-size: 0.875rem;
+  color: #6e6e73;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.parent-insights-content {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e5e7;
+}
+
+.parent-insights-content h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin-bottom: 1rem;
+}
+
+.insights-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.insight-item {
+  padding: 1rem;
+  background: #f5f5f7;
+  border-radius: 12px;
+  border-left: 3px solid #8b5cf6;
+}
+
+.insight-category {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #8b5cf6;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.insight-text {
+  font-size: 0.875rem;
+  color: #1d1d1f;
+  line-height: 1.6;
+  margin-bottom: 0.75rem;
+}
+
+.insight-recommendation {
+  font-size: 0.8125rem;
+  color: #6e6e73;
+  line-height: 1.6;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e5e5e7;
+}
+
+.insight-recommendation strong {
+  color: #1d1d1f;
+  font-weight: 600;
+}
+
+@media (max-width: 1024px) {
+  .parent-insights-toggle {
+    position: static;
+  }
+}
+

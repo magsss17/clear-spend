@@ -157,7 +157,11 @@ struct HomeView: View {
                 
                 Spacer()
                 
-                // Button disabled - View NFT functionality removed
+                NavigationLink(destination: CreditJourneyView()) {
+                    Text("View Details")
+                        .font(.caption)
+                        .foregroundColor(.purple)
+                }
             }
             
             HStack {
@@ -169,10 +173,6 @@ struct HomeView: View {
                     Text("Excellent Credit")
                         .font(.subheadline)
                         .foregroundColor(.green)
-                    
-                    Text("Built from 23 verified $2 purchases")
-                        .font(.caption)
-                        .foregroundColor(.gray)
                 }
                 
                 Spacer()

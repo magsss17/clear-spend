@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClearSpend - Credit Journey Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background-color: #f5f5f7;
+            color: #1d1d1f;
+            padding: 2rem;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #6e6e73;
+            font-size: 1.1rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .score-display {
+            text-align: center;
+        }
+
+        .score-number {
+            font-size: 4rem;
+            font-weight: 700;
+            color: #10b981;
+            margin: 1rem 0;
+        }
+
+        .score-level {
+            font-size: 1.25rem;
+            color: #10b981;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .progress-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 8px;
+            background-color: #e5e5e7;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #10b981;
+            width: 74%;
+            border-radius: 4px;
+        }
+
+        .breakdown-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .breakdown-item {
+            padding: 1.5rem;
+            background: #f5f5f7;
+            border-radius: 12px;
+            border-left: 4px solid #8b5cf6;
+        }
+
+        .breakdown-item h3 {
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .breakdown-score {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1d1d1f;
+            margin: 0.5rem 0;
+        }
+
+        .breakdown-progress {
+            height: 6px;
+            background-color: #e5e5e7;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+
+        .breakdown-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+            border-radius: 3px;
+        }
+
+        .milestones-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .milestone {
+            padding: 1.5rem;
+            background: #f5f5f7;
+            border-radius: 12px;
+            border: 2px solid #e5e5e7;
+            position: relative;
+        }
+
+        .milestone.achieved {
+            border-color: #10b981;
+            background: linear-gradient(135deg, #d1fae5 0%, #f5f5f7 100%);
+        }
+
+        .milestone-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .milestone h4 {
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .milestone p {
+            font-size: 0.875rem;
+            color: #6e6e73;
+            margin-bottom: 1rem;
+        }
+
+        .milestone-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #10b981;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .parent-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 52px;
+            height: 28px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #e5e5e7;
+            transition: 0.3s;
+            border-radius: 28px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: #8b5cf6;
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        .parent-insights {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #fef3c7;
+            border-radius: 12px;
+            border-left: 4px solid #f59e0b;
+            display: none;
+        }
+
+        .parent-insights.show {
+            display: block;
+        }
+
+        .insight-item {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .insight-category {
+            font-weight: 600;
+            color: #8b5cf6;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .breakdown-grid,
+            .milestones-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Credit Journey Dashboard</h1>
+            <p class="subtitle">Track your financial progress and build credit history</p>
+        </header>
+
+        <div class="card score-display">
+            <h2>Current Credit Score</h2>
+            <div class="score-number">742</div>
+            <div class="score-level">Excellent Credit</div>
+            <div class="progress-container">
+                <span>300</span>
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                <span>850</span>
+            </div>
+            <p style="color: #6e6e73; margin-top: 1rem;">Built from 23 verified purchases</p>
+        </div>
+
+        <div class="card">
+            <h2>Credit Score Breakdown</h2>
+            <p style="color: #6e6e73; margin-bottom: 1.5rem;">Your credit score is calculated from these factors:</p>
+            
+            <div style="background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; border-left: 4px solid #8b5cf6;">
+                <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;">📖 How Your Credit Score is Calculated</h3>
+                <p style="color: #374151; margin-bottom: 1rem; line-height: 1.6;">
+                    Your credit score (out of 850) is calculated by combining four key factors, each with a specific weight:
+                </p>
+                <ul style="list-style: none; padding: 0; margin: 1rem 0; display: flex; flex-direction: column; gap: 1rem;">
+                    <li style="padding: 1rem; background: white; border-radius: 8px; border-left: 3px solid #8b5cf6; line-height: 1.6; color: #374151;">
+                        <strong style="color: #8b5cf6;">Spending Consistency (35%)</strong> - Measures how consistently you make responsible purchases. 
+                        Factors include regular spending patterns, no overspending instances, and maintaining good spending streaks.
+                    </li>
+                    <li style="padding: 1rem; background: white; border-radius: 8px; border-left: 3px solid #8b5cf6; line-height: 1.6; color: #374151;">
+                        <strong style="color: #8b5cf6;">Savings Rate (30%)</strong> - Tracks what percentage of your allowance you save versus spend. 
+                        Higher savings rates show financial responsibility and planning ahead.
+                    </li>
+                    <li style="padding: 1rem; background: white; border-radius: 8px; border-left: 3px solid #8b5cf6; line-height: 1.6; color: #374151;">
+                        <strong style="color: #8b5cf6;">Merchant Diversity (25%)</strong> - Rewards shopping at a variety of approved merchants across 
+                        different categories. This shows responsible exploration and spending diversity.
+                    </li>
+                    <li style="padding: 1rem; background: white; border-radius: 8px; border-left: 3px solid #8b5cf6; line-height: 1.6; color: #374151;">
+                        <strong style="color: #8b5cf6;">Financial Education (10%)</strong> - Based on your engagement with learning modules and financial 
+                        literacy content. Completing lessons and earning XP demonstrates commitment to financial education.
+                    </li>
+                </ul>
+                <p style="margin-top: 1rem; padding: 0.75rem; background: rgba(139, 92, 246, 0.1); border-radius: 8px; font-size: 0.875rem; color: #6b7280; font-style: italic;">
+                    Each factor is scored out of 100, then multiplied by its weight percentage to contribute to your total score.
+                </p>
+            </div>
+            
+            <div class="breakdown-grid">
+                <div class="breakdown-item">
+                    <h3>📊 Spending Consistency</h3>
+                    <div class="breakdown-score">85/100</div>
+                    <div class="breakdown-progress">
+                        <div class="breakdown-progress-fill" style="width: 85%"></div>
+                    </div>
+                    <p style="font-size: 0.875rem; color: #6e6e73;">Weight: 35%</p>
+                    <p style="font-size: 0.875rem; color: #6e6e73; margin-top: 0.5rem;">Consistency in spending patterns and responsible purchase behavior</p>
+                </div>
+
+                <div class="breakdown-item">
+                    <h3>💾 Savings Rate</h3>
+                    <div class="breakdown-score">72/100</div>
+                    <div class="breakdown-progress">
+                        <div class="breakdown-progress-fill" style="width: 72%"></div>
+                    </div>
+                    <p style="font-size: 0.875rem; color: #6e6e73;">Weight: 30%</p>
+                    <p style="font-size: 0.875rem; color: #6e6e73; margin-top: 0.5rem;">Percentage of allowance saved versus spent</p>
+                </div>
+
+                <div class="breakdown-item">
+                    <h3>🏪 Merchant Diversity</h3>
+                    <div class="breakdown-score">78/100</div>
+                    <div class="breakdown-progress">
+                        <div class="breakdown-progress-fill" style="width: 78%"></div>
+                    </div>
+                    <p style="font-size: 0.875rem; color: #6e6e73;">Weight: 25%</p>
+                    <p style="font-size: 0.875rem; color: #6e6e73; margin-top: 0.5rem;">Variety of merchants and responsible category spending</p>
+                </div>
+
+                <div class="breakdown-item">
+                    <h3>📚 Financial Education</h3>
+                    <div class="breakdown-score">90/100</div>
+                    <div class="breakdown-progress">
+                        <div class="breakdown-progress-fill" style="width: 90%"></div>
+                    </div>
+                    <p style="font-size: 0.875rem; color: #6e6e73;">Weight: 10%</p>
+                    <p style="font-size: 0.875rem; color: #6e6e73; margin-top: 0.5rem;">Engagement with financial literacy modules</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="parent-toggle">
+                <h2>Parent Mode</h2>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="parentToggle" onchange="toggleParentMode()">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            <p style="color: #6e6e73; font-size: 0.875rem;">Enable parent mode to see detailed credit insights and recommendations.</p>
+            
+            <div id="parentInsights" class="parent-insights">
+                <h3 style="margin-bottom: 1rem;">💡 Credit Insights</h3>
+                
+                <div class="insight-item">
+                    <div class="insight-category">Spending Patterns</div>
+                    <p><strong>Insight:</strong> Your teen shows consistent spending across approved categories. No unauthorized purchases detected.</p>
+                    <p style="margin-top: 0.5rem;"><strong>Recommendation:</strong> Consider encouraging exploration of educational merchants to boost credit score.</p>
+                </div>
+
+                <div class="insight-item">
+                    <div class="insight-category">Savings Behavior</div>
+                    <p><strong>Insight:</strong> Savings rate has improved from 20% to 28% over the past month. Round-up feature is engaging.</p>
+                    <p style="margin-top: 0.5rem;"><strong>Recommendation:</strong> Set a savings goal milestone to maintain motivation.</p>
+                </div>
+
+                <div class="insight-item">
+                    <div class="insight-category">Merchant Diversity</div>
+                    <p><strong>Insight:</strong> Good diversity with 12 merchants across 5 categories. High-reputation merchant usage is excellent.</p>
+                    <p style="margin-top: 0.5rem;"><strong>Recommendation:</strong> Continue exploring new approved merchants to boost diversity score.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Milestones & Badges</h2>
+            <p style="color: #6e6e73; margin-bottom: 1.5rem;">Track your progress and unlock achievements</p>
+            
+            <div class="milestones-grid">
+                <div class="milestone achieved">
+                    <div class="milestone-badge">✓</div>
+                    <div class="milestone-icon">💾</div>
+                    <h4>First Round-Up Savings</h4>
+                    <p>Completed your first round-up savings transaction</p>
+                    <p style="font-size: 0.75rem; color: #6e6e73;">Achieved: Jan 15, 2025 • +25 pts</p>
+                </div>
+
+                <div class="milestone achieved">
+                    <div class="milestone-badge">✓</div>
+                    <div class="milestone-icon">🔥</div>
+                    <h4>3 Weeks of Responsible Spending</h4>
+                    <p>Maintained consistent spending for 3 consecutive weeks</p>
+                    <p style="font-size: 0.75rem; color: #6e6e73;">Achieved: Jan 20, 2025 • +50 pts</p>
+                </div>
+
+                <div class="milestone achieved">
+                    <div class="milestone-badge">✓</div>
+                    <div class="milestone-icon">🏪</div>
+                    <h4>Diverse Shopping</h4>
+                    <p>Made purchases from 5 different merchants</p>
+                    <p style="font-size: 0.75rem; color: #6e6e73;">Achieved: Jan 10, 2025 • +30 pts</p>
+                </div>
+
+                <div class="milestone">
+                    <div class="milestone-icon">🏆</div>
+                    <h4>Credit Elite</h4>
+                    <p>Reach a credit score of 750+</p>
+                    <div class="breakdown-progress" style="margin-top: 0.5rem;">
+                        <div class="breakdown-progress-fill" style="width: 99%"></div>
+                    </div>
+                    <p style="font-size: 0.75rem; color: #6e6e73; margin-top: 0.5rem;">742/750 • +100 pts when achieved</p>
+                </div>
+
+                <div class="milestone">
+                    <div class="milestone-icon">⭐</div>
+                    <h4>Monthly Champion</h4>
+                    <p>4 weeks of consistent responsible spending</p>
+                    <div class="breakdown-progress" style="margin-top: 0.5rem;">
+                        <div class="breakdown-progress-fill" style="width: 75%"></div>
+                    </div>
+                    <p style="font-size: 0.75rem; color: #6e6e73; margin-top: 0.5rem;">3/4 weeks • +75 pts when achieved</p>
+                </div>
+
+                <div class="milestone">
+                    <div class="milestone-icon">💰</div>
+                    <h4>Century Saver</h4>
+                    <p>Save $100 in your emergency fund</p>
+                    <div class="breakdown-progress" style="margin-top: 0.5rem;">
+                        <div class="breakdown-progress-fill" style="width: 45%"></div>
+                    </div>
+                    <p style="font-size: 0.75rem; color: #6e6e73; margin-top: 0.5rem;">$45/$100 • +75 pts when achieved</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleParentMode() {
+            const toggle = document.getElementById('parentToggle');
+            const insights = document.getElementById('parentInsights');
+            
+            if (toggle.checked) {
+                insights.classList.add('show');
+            } else {
+                insights.classList.remove('show');
+            }
+        }
+    </script>
+</body>
+</html>
+

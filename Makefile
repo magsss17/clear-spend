@@ -1,20 +1,22 @@
 # ClearSpend Project Makefile
 
-.PHONY: help install backend ios test clean deploy docker
+.PHONY: help install backend ios test clean deploy docker dashboard dashboard-install
 
 # Default target
 help:
 	@echo "ClearSpend - Teen Financial Literacy on Algorand"
 	@echo ""
 	@echo "Available targets:"
-	@echo "  install     - Install all dependencies"
-	@echo "  backend     - Start backend API server"
-	@echo "  ios         - Build iOS app (requires Xcode)"
-	@echo "  test        - Run all tests"
-	@echo "  deploy      - Deploy smart contracts"
-	@echo "  docker      - Run with Docker Compose"
-	@echo "  clean       - Clean up temporary files"
-	@echo "  help        - Show this help message"
+	@echo "  install          - Install all dependencies"
+	@echo "  backend          - Start backend API server"
+	@echo "  ios              - Build iOS app (requires Xcode)"
+	@echo "  dashboard        - Start Credit Journey Dashboard (React)"
+	@echo "  dashboard-install - Install dashboard dependencies"
+	@echo "  test             - Run all tests"
+	@echo "  deploy           - Deploy smart contracts"
+	@echo "  docker           - Run with Docker Compose"
+	@echo "  clean            - Clean up temporary files"
+	@echo "  help             - Show this help message"
 
 # Install dependencies
 install:
@@ -36,6 +38,26 @@ ios:
 		cd ios-app && xcodebuild -project ClearSpendApp.xcodeproj -scheme ClearSpendApp -destination 'platform=iOS Simulator,name=iPhone 15' build; \
 	else \
 		echo "Xcode not found. Please install Xcode to build the iOS app."; \
+	fi
+
+# Install dashboard dependencies
+dashboard-install:
+	@echo "Installing Credit Journey Dashboard dependencies..."
+	@if [ -d "web-dashboard" ]; then \
+		cd web-dashboard && npm install; \
+		echo "Dashboard dependencies installed successfully!"; \
+	else \
+		echo "web-dashboard directory not found!"; \
+	fi
+
+# Start Credit Journey Dashboard
+dashboard:
+	@echo "Starting Credit Journey Dashboard..."
+	@if [ -d "web-dashboard" ]; then \
+		cd web-dashboard && npm run dev; \
+	else \
+		echo "web-dashboard directory not found!"; \
+		echo "Run 'make dashboard-install' first to set up the dashboard."; \
 	fi
 
 # Run tests
