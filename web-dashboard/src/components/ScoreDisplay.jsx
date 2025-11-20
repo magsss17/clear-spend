@@ -61,3 +61,5 @@ function ScoreDisplay({ score, scoreRange, level, color, recentActivity }) {
 
 export default ScoreDisplay
 
+
+

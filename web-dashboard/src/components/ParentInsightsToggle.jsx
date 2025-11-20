@@ -45,3 +45,5 @@ function ParentInsightsToggle({ parentMode, onToggle, insights }) {
 
 export default ParentInsightsToggle
 
+
+
