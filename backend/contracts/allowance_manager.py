@@ -3,7 +3,7 @@ ClearSpend Allowance Manager Smart Contract
 Manages teen allowances with parental controls using AlgoKit
 """
 
-from algopy import ARC4Contract, UInt64, Bytes, Global, Txn, op, subroutine, arc4
+from algopy import ARC4Contract, UInt64, Bytes, Global, Txn, op, subroutine, arc4, gtxn, Application
 from algopy.arc4 import String, Bool, Address, DynamicArray
 
 class AllowanceRecord(ARC4Contract):
@@ -41,6 +41,11 @@ class AllowanceManager(ARC4Contract):
         self.savings_locked = UInt64(0)
         self.savings_unlock_time = UInt64(0)
         self.contract_created = Global.latest_timestamp
+        # Instance can be soft-disabled by parent (backend can skip inactive deployments)
+        self.is_live = Bool(True)
+        # Rolling weekly spend against weekly_allowance (microAlgos)
+        self.spent_this_week = UInt64(0)
+        self.week_bucket_start = UInt64(0)
     
     @arc4.abimethod
     def issue_weekly_allowance(self) -> UInt64:
@@ -100,6 +105,13 @@ class AllowanceManager(ARC4Contract):
         op.log(b"ALLOWANCE_RESUMED")
         op.log(op.itob(Global.latest_timestamp))
     
+    @arc4.abimethod
+    def set_instance_active(self, active: Bool) -> None:
+        """Enable/disable this allowance contract instance (parent only)."""
+        assert Txn.sender == self.parent.native, "Only parent can set instance active"
+        self.is_live = active
+        op.log(b"INSTANCE_ACTIVE_SET")
+
     @arc4.abimethod
     def update_weekly_amount(self, new_amount: UInt64) -> None:
         """Update weekly allowance amount (parent only)"""
@@ -171,9 +183,9 @@ class AllowanceManager(ARC4Contract):
         Group should contain:
         1. App call to attestation oracle (verify purchase)
         2. This app call (check allowance limits)
-        3. ASA transfer (execute payment)
+        3. ALGO PaymentTxn (execute payment)
         """
-        
+        assert self.is_live, "Allowance contract instance is not active"
         # Verify not paused
         assert not self.is_paused, "Allowance is paused"
         
@@ -185,9 +197,25 @@ class AllowanceManager(ARC4Contract):
         
         # This should be the second transaction in the group
         assert Txn.group_index == UInt64(1), "Invalid group position"
+
+        attestation_app = Application(self.attestation_app_id)
+        ao_txn = gtxn.ApplicationCallTransaction(UInt64(0))
+        assert ao_txn.app_id == attestation_app, "Txn0 must call attestation oracle app"
+        assert ao_txn.sender == self.teen.native, "Txn0 sender must be teen"
+
+        pay_txn = gtxn.PaymentTransaction(UInt64(2))
+        assert pay_txn.sender == self.teen.native, "Payment sender must be teen"
+        assert pay_txn.amount == amount, "Payment amount must match purchase amount"
         
-        # Check if amount is reasonable (not more than weekly allowance)
-        assert amount <= self.weekly_allowance, "Purchase exceeds weekly allowance"
+        # Rolling weekly cap: sum of purchases in the current week bucket may not exceed weekly_allowance
+        assert amount > UInt64(0), "Amount must be positive"
+        current_time = Global.latest_timestamp
+        week_in_seconds = UInt64(604800)
+        if self.week_bucket_start == UInt64(0) or current_time >= self.week_bucket_start + week_in_seconds:
+            self.spent_this_week = UInt64(0)
+            self.week_bucket_start = current_time
+        assert self.spent_this_week + amount <= self.weekly_allowance, "Weekly spend cap exceeded"
+        self.spent_this_week += amount
         
         # Log purchase
         op.log(b"PURCHASE_PROCESSED")
@@ -196,6 +224,25 @@ class AllowanceManager(ARC4Contract):
         op.log(op.itob(Global.latest_timestamp))
         
         return Bool(True)
+
+    @arc4.abimethod(readonly=True)
+    def role_of(self, addr: Address) -> UInt64:
+        """Return 0 = none, 1 = parent, 2 = teen for the given address."""
+        if addr.native == self.parent.native:
+            return UInt64(1)
+        if addr.native == self.teen.native:
+            return UInt64(2)
+        return UInt64(0)
+
+    @arc4.abimethod(readonly=True)
+    def get_instance_active(self) -> Bool:
+        """Whether this allowance contract instance is live (parent may disable)."""
+        return self.is_live
+
+    @arc4.abimethod(readonly=True)
+    def get_weekly_purchase_usage(self) -> tuple[UInt64, UInt64]:
+        """spent_this_week (microAlgos), week_bucket_start (unix timestamp; 0 = not started)."""
+        return (self.spent_this_week, self.week_bucket_start)
     
     @arc4.abimethod
     def transfer_allowance_control(self, new_parent: Address) -> None:

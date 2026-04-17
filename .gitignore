@@ -92,3 +92,6 @@ node_modules/
 *.js
 !ClearSpend/**/*.js
 package-lock.json
+
+# Local Python venvs (contract tooling / experiments)
+.venv-contracts/

@@ -3,7 +3,7 @@ ClearSpend Attestation Oracle Smart Contract
 Manages merchant attestations and purchase verification using AlgoKit
 """
 
-from algopy import ARC4Contract, UInt64, Bytes, Global, Txn, op, subroutine, BoxRef, arc4
+from algopy import ARC4Contract, UInt64, Bytes, Global, Txn, op, subroutine, BoxRef, arc4, gtxn
 from algopy.arc4 import String, Bool, Struct, DynamicArray, Address
 
 class MerchantAttestation(Struct):
@@ -15,6 +15,8 @@ class MerchantAttestation(Struct):
     total_spent_today: UInt64
     last_update: UInt64
     parent_approved: Bool
+    # On-chain payout address for atomic ALGO PaymentTxn (txn 2 of the purchase group)
+    merchant_address: Address
 
 class PurchaseRequest(Struct):
     """Purchase request data structure"""
@@ -44,7 +46,8 @@ class AttestationOracle(ARC4Contract):
         category: String,
         is_approved: Bool,
         daily_limit: UInt64,
-        parent_approved: Bool
+        parent_approved: Bool,
+        merchant_address: Address,
     ) -> UInt64:
         """Add or update merchant attestation (oracle only)"""
         assert Txn.sender == self.oracle.native, "Only oracle can add attestations"
@@ -57,7 +60,8 @@ class AttestationOracle(ARC4Contract):
             daily_limit=daily_limit,
             total_spent_today=UInt64(0),
             last_update=Global.latest_timestamp,
-            parent_approved=parent_approved
+            parent_approved=parent_approved,
+            merchant_address=merchant_address,
         )
         
         # Store in box storage with merchant name as key
@@ -88,7 +92,11 @@ class AttestationOracle(ARC4Contract):
         Verify if purchase is allowed based on attestation
         Called as part of atomic transfer group
         """
-        
+        # Must be the 3-txn atomic purchase group: AO (0) -> AM (1) -> Payment (2)
+        assert Global.group_size == UInt64(3), "Invalid atomic group"
+        assert Txn.group_index == UInt64(0), "Attestation must be first txn in group"
+        assert Txn.sender == user_address.native, "Sender must match user_address"
+
         # Get merchant attestation from box storage
         merchant_key = self._create_merchant_key(merchant_name)
         merchant_box = BoxRef(key=merchant_key)
@@ -99,6 +107,12 @@ class AttestationOracle(ARC4Contract):
         
         attestation_bytes = merchant_box.get()
         attestation = MerchantAttestation.from_bytes(attestation_bytes)
+
+        # Bind this verification to the ALGO payment in txn 2 (same group)
+        pay_txn = gtxn.PaymentTransaction(UInt64(2))
+        assert pay_txn.sender == user_address.native, "Payment sender must match teen"
+        assert pay_txn.amount == amount, "Payment amount must match purchase amount"
+        assert pay_txn.receiver == attestation.merchant_address.native, "Payment receiver must match merchant_address"
         
         # Check if merchant is approved
         if not attestation.is_approved:
@@ -177,10 +191,9 @@ class AttestationOracle(ARC4Contract):
         merchant_name: String,
         approved: Bool
     ) -> None:
-        """Allow parents to approve/disapprove specific merchants"""
-        # In production, this would verify parent signature
-        # For now, we'll allow any caller to simulate parent approval
-        
+        """Update parent_approved flag (oracle only — oracle attests off-chain parent consent)."""
+        assert Txn.sender == self.oracle.native, "Only oracle can update parent approval"
+
         merchant_key = self._create_merchant_key(merchant_name)
         merchant_box = BoxRef(key=merchant_key)
         
