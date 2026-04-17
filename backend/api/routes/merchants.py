@@ -18,46 +18,40 @@ from ..models.responses import (
 )
 from ...services.oracle_service import OracleService
 from ...services.blockchain_service import BlockchainService
+from ..deps import get_oracle_service, get_blockchain_service
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/merchants", tags=["merchants"])
 
-# Global shared oracle service instance
-_shared_oracle_service = None
-
-def get_oracle_service() -> OracleService:
-    """Get shared oracle service instance"""
-    global _shared_oracle_service
-    if _shared_oracle_service is None:
-        blockchain_service = BlockchainService()
-        _shared_oracle_service = OracleService(blockchain_service)
-        logger.info("Created shared OracleService instance")
-    return _shared_oracle_service
-
 @router.get("/", response_model=Dict[str, List[MerchantAttestationResponse]])
 async def get_all_merchants(
-    oracle_service: OracleService = Depends(get_oracle_service)
+    blockchain_service: BlockchainService = Depends(get_blockchain_service)
 ):
-    """Get all merchant attestations"""
+    """Get all merchant attestations from on-chain storage."""
     try:
-        attestations = oracle_service.get_merchant_attestations()
-        
+        result = blockchain_service.list_merchants()
+        if result.get("error"):
+            raise HTTPException(status_code=502, detail=result["error"])
+
+        merchant_records = result.get("merchants", [])
         merchants = []
-        for name, attestation in attestations.items():
+        for merchant in merchant_records:
+            if merchant.get("error"):
+                continue
             merchants.append(MerchantAttestationResponse(
                 success=True,
-                merchant_name=attestation.merchant_name,
-                category=attestation.category,
-                is_approved=attestation.is_approved,
-                daily_limit=attestation.daily_limit,
-                total_spent_today=attestation.total_spent_today,
-                parent_approved=attestation.parent_approved,
-                last_update=attestation.last_update
+                merchant_name=merchant.get("merchant_name", ""),
+                category=merchant.get("category", "unknown"),
+                is_approved=merchant.get("is_approved", False),
+                daily_limit=merchant.get("daily_limit", 0),
+                total_spent_today=merchant.get("total_spent_today", 0),
+                parent_approved=merchant.get("parent_approved", False),
+                last_update=merchant.get("last_update", 0)
             ))
-        
+
         return {"merchants": merchants}
-        
+
     except Exception as e:
         logger.error(f"Failed to get merchants: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -65,26 +59,25 @@ async def get_all_merchants(
 @router.get("/{merchant_name}", response_model=MerchantAttestationResponse)
 async def get_merchant(
     merchant_name: str,
-    oracle_service: OracleService = Depends(get_oracle_service)
+    blockchain_service: BlockchainService = Depends(get_blockchain_service)
 ):
-    """Get specific merchant attestation"""
+    """Get specific merchant attestation from on-chain storage."""
     try:
-        attestation = oracle_service.get_merchant_attestation(merchant_name)
-        
-        if not attestation:
-            raise HTTPException(status_code=404, detail="Merchant not found")
-        
+        attestation = blockchain_service.get_merchant_attestation(merchant_name)
+        if attestation.get("error"):
+            raise HTTPException(status_code=404, detail=attestation["error"])
+
         return MerchantAttestationResponse(
             success=True,
-            merchant_name=attestation.merchant_name,
-            category=attestation.category,
-            is_approved=attestation.is_approved,
-            daily_limit=attestation.daily_limit,
-            total_spent_today=attestation.total_spent_today,
-            parent_approved=attestation.parent_approved,
-            last_update=attestation.last_update
+            merchant_name=attestation.get("merchant_name", merchant_name),
+            category=attestation.get("category", "unknown"),
+            is_approved=attestation.get("is_approved", False),
+            daily_limit=attestation.get("daily_limit", 0),
+            total_spent_today=attestation.get("total_spent_today", 0),
+            parent_approved=attestation.get("parent_approved", False),
+            last_update=attestation.get("last_update", 0)
         )
-        
+
     except HTTPException:
         raise
     except Exception as e:

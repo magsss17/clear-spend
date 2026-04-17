@@ -10,7 +10,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from .api.routes import merchants, purchases, allowances, transactions, health
+from .api.routes import merchants, purchases, allowances, transactions, health, credit_journey
+from .api.deps import set_services, clear_services
 from .services.blockchain_service import BlockchainService
 from .services.oracle_service import OracleService
 
@@ -45,6 +46,7 @@ async def lifespan(app: FastAPI):
         
         # Initialize oracle service
         oracle_service = OracleService(blockchain_service)
+        set_services(blockchain_service, oracle_service)
         logger.info("Oracle service initialized")
         
         # Deploy contracts (in production, this would be done separately)
@@ -67,6 +69,7 @@ async def lifespan(app: FastAPI):
     
     # Shutdown
     logger.info("Shutting down ClearSpend Backend API...")
+    clear_services()
 
 # Create FastAPI application
 app = FastAPI(
@@ -91,6 +94,7 @@ app.include_router(merchants.router)
 app.include_router(purchases.router)
 app.include_router(allowances.router)
 app.include_router(transactions.router)
+app.include_router(credit_journey.router)
 
 @app.get("/")
 async def root():
@@ -134,23 +138,6 @@ async def general_exception_handler(request, exc):
             "status_code": 500
         }
     )
-
-# Dependency injection for services
-def get_blockchain_service() -> BlockchainService:
-    """Get blockchain service instance"""
-    if blockchain_service is None:
-        raise HTTPException(status_code=503, detail="Blockchain service not initialized")
-    return blockchain_service
-
-def get_oracle_service() -> OracleService:
-    """Get oracle service instance"""
-    if oracle_service is None:
-        raise HTTPException(status_code=503, detail="Oracle service not initialized")
-    return oracle_service
-
-# Make services available to routes
-app.dependency_overrides[get_blockchain_service] = get_blockchain_service
-app.dependency_overrides[get_oracle_service] = get_oracle_service
 
 if __name__ == "__main__":
     import uvicorn

@@ -16,14 +16,11 @@ from ..models.responses import (
     BaseResponse
 )
 from ...services.blockchain_service import BlockchainService
+from ..deps import get_blockchain_service
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/allowances", tags=["allowances"])
-
-# Dependency injection
-def get_blockchain_service() -> BlockchainService:
-    return BlockchainService()
 
 @router.post("/issue", response_model=AllowanceResponse)
 async def issue_weekly_allowance(
@@ -85,22 +82,24 @@ async def get_allowance_status(
     teen_address: str,
     blockchain_service: BlockchainService = Depends(get_blockchain_service)
 ):
-    """Get current allowance status for a teen"""
+    """Get current allowance status from on-chain contract state."""
     try:
-        # For demo purposes, we'll return mock status
-        # In production, this would query the smart contract
-        
+        state_result = blockchain_service.get_allowance_state()
+        if state_result.get("error"):
+            raise HTTPException(status_code=502, detail=state_result["error"])
+
+        global_state = state_result.get("global_state", {})
         return AllowanceResponse(
             success=True,
             teen_address=teen_address,
-            weekly_amount=150000000,  # 150 ALGO in microAlgos
-            total_issued=600000000,   # 600 ALGO total issued
-            last_allowance_time=int(__import__('time').time()) - 86400,  # 1 day ago
-            is_paused=False,
-            can_issue=True,
+            weekly_amount=int(global_state.get("weekly_allowance", 0)),
+            total_issued=int(global_state.get("total_issued", 0)),
+            last_allowance_time=int(global_state.get("last_allowance_time", 0)),
+            is_paused=bool(global_state.get("is_paused", 0)),
+            can_issue=bool(global_state.get("can_issue", False)),
             message="Allowance status retrieved successfully"
         )
-        
+
     except Exception as e:
         logger.error(f"Failed to get allowance status: {e}")
         raise HTTPException(status_code=500, detail=str(e))

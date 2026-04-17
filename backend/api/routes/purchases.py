@@ -10,22 +10,12 @@ from ..models.requests import PurchaseRequest
 from ..models.responses import PurchaseResponse
 from ...services.oracle_service import OracleService
 from ...services.blockchain_service import BlockchainService
+from ..deps import get_oracle_service
+from ..deps import get_blockchain_service
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/purchases", tags=["purchases"])
-
-# Global shared oracle service instance
-_shared_oracle_service = None
-
-def get_oracle_service() -> OracleService:
-    """Get shared oracle service instance"""
-    global _shared_oracle_service
-    if _shared_oracle_service is None:
-        blockchain_service = BlockchainService()
-        _shared_oracle_service = OracleService(blockchain_service)
-        logger.info("Created shared OracleService instance")
-    return _shared_oracle_service
 
 @router.post("/verify", response_model=PurchaseResponse)
 async def verify_purchase(
@@ -102,21 +92,23 @@ async def execute_purchase(
 @router.get("/{transaction_id}/status", response_model=PurchaseResponse)
 async def get_purchase_status(
     transaction_id: str,
-    oracle_service: OracleService = Depends(get_oracle_service)
+    blockchain_service: BlockchainService = Depends(get_blockchain_service)
 ):
     """Get the status of a purchase transaction"""
     try:
-        # In production, this would query the blockchain for transaction status
-        # For demo, we'll return a mock status
-        
+        status = blockchain_service.get_transaction_status(transaction_id)
+        if status.get("error"):
+            raise HTTPException(status_code=404, detail=status["error"])
+
         return PurchaseResponse(
             success=True,
-            approved=True,
-            transaction_id=transaction_id,
+            approved=bool(status.get("confirmed")),
+            transaction_id=status.get("id", transaction_id),
             explorer_link=f"https://testnet.algoexplorer.io/tx/{transaction_id}",
-            message="Transaction confirmed"
+            amount=status.get("amount"),
+            message="Transaction confirmed" if status.get("confirmed") else "Transaction pending"
         )
-        
+
     except Exception as e:
         logger.error(f"Failed to get purchase status: {e}")
         raise HTTPException(status_code=500, detail=str(e))

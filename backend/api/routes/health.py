@@ -12,6 +12,7 @@ from ..models.responses import (
     BaseResponse
 )
 from ...services.blockchain_service import BlockchainService
+from ..deps import get_blockchain_service
 
 logger = logging.getLogger(__name__)
 
@@ -19,10 +20,6 @@ router = APIRouter(prefix="/api/v1/health", tags=["health"])
 
 # Track service start time
 service_start_time = time.time()
-
-# Dependency injection
-def get_blockchain_service() -> BlockchainService:
-    return BlockchainService()
 
 @router.get("/", response_model=HealthCheckResponse)
 async def health_check(

@@ -13,14 +13,11 @@ from ..models.responses import (
     AccountInfoResponse
 )
 from ...services.blockchain_service import BlockchainService
+from ..deps import get_blockchain_service
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/transactions", tags=["transactions"])
-
-# Dependency injection
-def get_blockchain_service() -> BlockchainService:
-    return BlockchainService()
 
 @router.get("/{user_address}", response_model=TransactionHistoryResponse)
 async def get_transaction_history(
@@ -73,15 +70,23 @@ async def get_transaction_analytics(
         transactions = blockchain_service.get_transaction_history(user_address, 100)
         
         # Calculate analytics
-        total_spent = sum(tx.get("amount", 0) for tx in transactions if tx.get("type") == "pay")
-        total_received = sum(tx.get("amount", 0) for tx in transactions if tx.get("receiver") == user_address)
+        total_spent = sum(
+            tx.get("amount", 0)
+            for tx in transactions
+            if tx.get("type") == "pay" and tx.get("sender") == user_address
+        )
+        total_received = sum(
+            tx.get("amount", 0)
+            for tx in transactions
+            if tx.get("type") == "pay" and tx.get("receiver") == user_address
+        )
         transaction_count = len(transactions)
         
         # Group by merchant (from transaction notes)
         merchant_spending = {}
         for tx in transactions:
             if tx.get("type") == "pay" and tx.get("note"):
-                note = tx.get("note", "").decode() if isinstance(tx.get("note"), bytes) else str(tx.get("note", ""))
+                note = str(tx.get("note", ""))
                 if "ClearSpend purchase at" in note:
                     merchant = note.replace("ClearSpend purchase at ", "").strip()
                     if merchant not in merchant_spending:

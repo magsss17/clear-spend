@@ -5,7 +5,7 @@ Handles all Algorand blockchain interactions using AlgoKit
 
 import os
 import json
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 from datetime import datetime, timedelta
 from algosdk import account, mnemonic, transaction
 from algosdk.v2client import algod, indexer
@@ -21,9 +21,10 @@ from algosdk.atomic_transaction_composer import (
     TransactionWithSigner,
     AccountTransactionSigner
 )
-from algosdk.abi import Contract
+from algosdk.abi import Contract, TupleType
 import base64
 import logging
+import httpx
 
 logger = logging.getLogger(__name__)
 
@@ -34,19 +35,214 @@ class BlockchainService:
         self.algod_token = os.getenv("ALGOD_TOKEN", "")
         self.algod_address = os.getenv("ALGOD_ADDRESS", "https://testnet-api.algonode.cloud")
         self.indexer_address = os.getenv("INDEXER_ADDRESS", "https://testnet-idx.algonode.cloud")
+        self.ipfs_gateway_base = os.getenv("IPFS_GATEWAY_BASE", "https://gateway.pinata.cloud/ipfs")
         
         # Initialize clients
         self.algod_client = algod.AlgodClient(self.algod_token, self.algod_address)
         self.indexer_client = indexer.IndexerClient("", self.indexer_address)
         
-        # Contract addresses (will be set after deployment)
-        self.attestation_oracle_app_id = None
-        self.allowance_manager_app_id = None
+        # Contract app IDs (prefer env config; may be set later after deployment)
+        self.attestation_oracle_app_id = self._read_int_env("ATTESTATION_ORACLE_APP_ID")
+        self.allowance_manager_app_id = self._read_int_env("ALLOWANCE_MANAGER_APP_ID")
+        self.credit_journey_app_id = self._read_int_env("CREDIT_JOURNEY_APP_ID")
         
         # Demo accounts for testing
         self.demo_parent_mnemonic = os.getenv("DEMO_PARENT_MNEMONIC", "")
         self.demo_teen_mnemonic = os.getenv("DEMO_TEEN_MNEMONIC", "")
         self.demo_oracle_mnemonic = os.getenv("DEMO_ORACLE_MNEMONIC", "")
+
+    @staticmethod
+    def _read_int_env(key: str) -> Optional[int]:
+        """Read an optional integer environment variable."""
+        value = os.getenv(key)
+        if value is None or value == "":
+            return None
+        try:
+            return int(value)
+        except ValueError:
+            logger.warning(f"Invalid integer for {key}: {value}")
+            return None
+
+    def _decode_note(self, note: Any) -> Optional[str]:
+        """Decode an indexer note payload to UTF-8 text when possible."""
+        if note is None:
+            return None
+        try:
+            if isinstance(note, bytes):
+                return note.decode("utf-8", errors="replace")
+            if isinstance(note, str):
+                decoded = base64.b64decode(note)
+                return decoded.decode("utf-8", errors="replace")
+            return str(note)
+        except Exception:
+            return str(note)
+
+    def _app_global_state(self, app_id: int) -> Dict[str, Any]:
+        """Fetch and decode application global state."""
+        app = self.algod_client.application_info(app_id)
+        kvs = app.get("params", {}).get("global-state", [])
+        decoded: Dict[str, Any] = {}
+        for entry in kvs:
+            key = base64.b64decode(entry["key"]).decode("utf-8", errors="ignore")
+            value = entry.get("value", {})
+            if value.get("type") == 1:
+                decoded[key] = base64.b64decode(value.get("bytes", "")).decode("utf-8", errors="replace")
+            else:
+                decoded[key] = value.get("uint", 0)
+        return decoded
+
+    def _list_box_names(self, app_id: int) -> List[bytes]:
+        """List box names for an app."""
+        boxes = self.algod_client.application_boxes(app_id).get("boxes", [])
+        return [base64.b64decode(b["name"]) for b in boxes]
+
+    def _read_box_bytes(self, app_id: int, box_name: bytes) -> bytes:
+        """Read a box value by name."""
+        response = self.algod_client.application_box_by_name(app_id, box_name)
+        raw = response.get("value", "")
+        if isinstance(raw, str):
+            return base64.b64decode(raw)
+        return raw
+
+    def _fetch_ipfs_json(self, cid: str) -> Optional[Dict[str, Any]]:
+        """Fetch JSON metadata from an IPFS gateway."""
+        if not cid:
+            return None
+        url = f"{self.ipfs_gateway_base.rstrip('/')}/{cid}"
+        try:
+            with httpx.Client(timeout=8.0) as client:
+                response = client.get(url)
+                response.raise_for_status()
+                payload = response.json()
+                if isinstance(payload, dict):
+                    return payload
+                return {"data": payload}
+        except Exception as e:
+            logger.warning(f"Failed to fetch IPFS metadata for CID {cid}: {e}")
+            return None
+
+    def _decode_attestation_box(self, payload: bytes) -> Dict[str, Any]:
+        """Decode MerchantAttestation ARC4 payload (supports 7-field and 8-field variants)."""
+        # Current on-chain struct: (name, category, approved, daily_limit, spent_today, last_update, parent_approved)
+        v1 = TupleType.from_string("(string,string,bool,uint64,uint64,uint64,bool)")
+        # Planned variant with metadata CID as trailing field.
+        v2 = TupleType.from_string("(string,string,bool,uint64,uint64,uint64,bool,string)")
+        for tuple_type in (v2, v1):
+            try:
+                decoded = tuple_type.decode(payload)
+                if len(decoded) == 8:
+                    return {
+                        "merchant_name": str(decoded[0]),
+                        "category": str(decoded[1]),
+                        "is_approved": bool(decoded[2]),
+                        "daily_limit": int(decoded[3]),
+                        "total_spent_today": int(decoded[4]),
+                        "last_update": int(decoded[5]),
+                        "parent_approved": bool(decoded[6]),
+                        "metadata_cid": str(decoded[7]),
+                    }
+                return {
+                    "merchant_name": str(decoded[0]),
+                    "category": str(decoded[1]),
+                    "is_approved": bool(decoded[2]),
+                    "daily_limit": int(decoded[3]),
+                    "total_spent_today": int(decoded[4]),
+                    "last_update": int(decoded[5]),
+                    "parent_approved": bool(decoded[6]),
+                }
+            except Exception:
+                continue
+        raise ValueError("Unable to decode merchant attestation payload")
+
+    def fetch_ipfs_metadata(self, cid: str) -> Dict[str, Any]:
+        """Public wrapper for fetching merchant metadata from IPFS."""
+        payload = self._fetch_ipfs_json(cid)
+        if payload is None:
+            return {"error": f"Unable to fetch metadata for CID {cid}"}
+        return {"cid": cid, "metadata": payload}
+
+    def get_allowance_state(self) -> Dict[str, Any]:
+        """Read AllowanceManager global state from chain."""
+        if not self.allowance_manager_app_id:
+            return {"error": "Allowance manager app ID is not configured"}
+        try:
+            return {"app_id": self.allowance_manager_app_id, "global_state": self._app_global_state(self.allowance_manager_app_id)}
+        except Exception as e:
+            logger.error(f"Failed to read allowance state: {e}")
+            return {"error": str(e)}
+
+    def get_credit_profile(self, teen_address: str) -> Dict[str, Any]:
+        """Read CreditJourney profile box for a teen."""
+        if not self.credit_journey_app_id:
+            return {"error": "CreditJourney app ID is not configured"}
+        try:
+            box_name = f"teen_{teen_address}".encode()
+            profile_bytes = self._read_box_bytes(self.credit_journey_app_id, box_name)
+            return {
+                "teen_address": teen_address,
+                "app_id": self.credit_journey_app_id,
+                # ABI decode will be added once credit_journey.py schema is finalized
+                "raw_profile_b64": base64.b64encode(profile_bytes).decode(),
+            }
+        except Exception as e:
+            logger.error(f"Failed to read credit profile for {teen_address}: {e}")
+            return {"error": str(e)}
+
+    def get_credit_milestones(self, teen_address: str) -> Dict[str, Any]:
+        """Read CreditJourney milestone box for a teen."""
+        if not self.credit_journey_app_id:
+            return {"error": "CreditJourney app ID is not configured"}
+        try:
+            box_name = f"milestones_{teen_address}".encode()
+            milestone_bytes = self._read_box_bytes(self.credit_journey_app_id, box_name)
+            return {
+                "teen_address": teen_address,
+                "app_id": self.credit_journey_app_id,
+                # ABI decode will be added once credit_journey.py schema is finalized
+                "raw_milestones_b64": base64.b64encode(milestone_bytes).decode(),
+            }
+        except Exception as e:
+            logger.error(f"Failed to read milestones for {teen_address}: {e}")
+            return {"error": str(e)}
+
+    def get_merchant_attestation(self, merchant_name: str) -> Dict[str, Any]:
+        """Read a merchant attestation box and enrich with IPFS metadata when available."""
+        if not self.attestation_oracle_app_id:
+            return {"error": "Attestation oracle app ID is not configured"}
+        try:
+            box_name = f"merchant_{merchant_name}".encode()
+            attestation_bytes = self._read_box_bytes(self.attestation_oracle_app_id, box_name)
+            decoded = self._decode_attestation_box(attestation_bytes)
+            result: Dict[str, Any] = {
+                **decoded,
+                "app_id": self.attestation_oracle_app_id,
+                "raw_attestation_b64": base64.b64encode(attestation_bytes).decode(),
+            }
+            metadata_cid = result.get("metadata_cid")
+            if metadata_cid:
+                metadata_payload = self._fetch_ipfs_json(str(metadata_cid))
+                if metadata_payload is not None:
+                    result["metadata"] = metadata_payload
+            return result
+        except Exception as e:
+            logger.error(f"Failed to read merchant attestation for {merchant_name}: {e}")
+            return {"error": str(e)}
+
+    def list_merchants(self) -> Dict[str, Any]:
+        """List merchant boxes from AttestationOracle and return lightweight records."""
+        if not self.attestation_oracle_app_id:
+            return {"error": "Attestation oracle app ID is not configured"}
+        try:
+            merchant_entries: List[Dict[str, Any]] = []
+            for name in self._list_box_names(self.attestation_oracle_app_id):
+                if not name.startswith(b"merchant_"):
+                    continue
+                merchant_name = name[len(b"merchant_"):].decode("utf-8", errors="replace")
+                merchant_entries.append(self.get_merchant_attestation(merchant_name))
+            return {"app_id": self.attestation_oracle_app_id, "merchants": merchant_entries}
+        except Exception as e:
+            logger.error(f"Failed to list merchant attestations: {e}")
+            return {"error": str(e)}
     
     def connect_to_algorand(self) -> bool:
         """Test connection to Algorand network"""
@@ -79,21 +275,23 @@ class BlockchainService:
     def get_transaction_history(self, address: str, limit: int = 50) -> List[Dict]:
         """Get transaction history for an address"""
         try:
-            transactions = self.indexer_client.search_transactions(
+            transactions_response = self.indexer_client.search_transactions(
                 address=address,
                 limit=limit
             )
             
             formatted_transactions = []
-            for tx in transactions.get('transactions', []):
+            for tx in transactions_response.get('transactions', []):
+                payment_txn = tx.get('payment-transaction', {})
                 formatted_tx = {
                     "id": tx.get('id'),
                     "type": tx.get('tx-type'),
                     "round": tx.get('confirmed-round'),
                     "timestamp": tx.get('round-time'),
                     "sender": tx.get('sender'),
-                    "amount": tx.get('payment-transaction', {}).get('amount', 0),
-                    "note": tx.get('note'),
+                    "receiver": payment_txn.get('receiver'),
+                    "amount": payment_txn.get('amount', 0),
+                    "note": self._decode_note(tx.get('note')),
                     "confirmed": tx.get('confirmed-round') is not None
                 }
                 formatted_transactions.append(formatted_tx)
@@ -102,6 +300,82 @@ class BlockchainService:
         except Exception as e:
             logger.error(f"Failed to get transaction history for {address}: {e}")
             return []
+
+    def get_transaction_status(self, transaction_id: str) -> Dict[str, Any]:
+        """Fetch transaction status/details from Algorand indexer."""
+        try:
+            tx = self.indexer_client.transaction(transaction_id).get("transaction", {})
+            payment_txn = tx.get("payment-transaction", {})
+            return {
+                "id": tx.get("id", transaction_id),
+                "type": tx.get("tx-type"),
+                "round": tx.get("confirmed-round"),
+                "timestamp": tx.get("round-time"),
+                "sender": tx.get("sender"),
+                "receiver": payment_txn.get("receiver"),
+                "amount": payment_txn.get("amount", 0),
+                "note": self._decode_note(tx.get("note")),
+                "confirmed": tx.get("confirmed-round") is not None,
+            }
+        except Exception as e:
+            logger.error(f"Failed to get transaction status for {transaction_id}: {e}")
+            return {"error": str(e)}
+
+    def get_parent_insights(self, teen_address: str, limit: int = 100) -> Dict[str, Any]:
+        """Compute parent insights from indexer activity + on-chain profile data."""
+        try:
+            transactions = self.get_transaction_history(teen_address, limit=limit)
+            profile = self.get_credit_profile(teen_address)
+            milestones = self.get_credit_milestones(teen_address)
+
+            spend_txs = [
+                tx for tx in transactions
+                if tx.get("type") == "pay" and tx.get("sender") == teen_address and tx.get("amount", 0) > 0
+            ]
+            incoming_txs = [
+                tx for tx in transactions
+                if tx.get("type") == "pay" and tx.get("receiver") == teen_address and tx.get("amount", 0) > 0
+            ]
+
+            # Build merchant/category distributions using note pattern.
+            merchant_spend: Dict[str, int] = {}
+            category_spend: Dict[str, int] = {}
+            for tx in spend_txs:
+                note = (tx.get("note") or "").strip()
+                merchant_name = "unknown"
+                if "ClearSpend purchase at" in note:
+                    merchant_name = note.split("ClearSpend purchase at", 1)[1].strip() or "unknown"
+                merchant_spend[merchant_name] = merchant_spend.get(merchant_name, 0) + int(tx.get("amount", 0))
+
+            for merchant_name, amount in merchant_spend.items():
+                merchant = self.get_merchant_attestation(merchant_name)
+                category = merchant.get("category", "unknown") if not merchant.get("error") else "unknown"
+                category_spend[category] = category_spend.get(category, 0) + amount
+
+            total_spent = sum(tx.get("amount", 0) for tx in spend_txs)
+            total_received = sum(tx.get("amount", 0) for tx in incoming_txs)
+            savings_rate = (total_received / total_spent) if total_spent > 0 else 0.0
+
+            return {
+                "teen_address": teen_address,
+                "transaction_window_count": len(transactions),
+                "spending_transaction_count": len(spend_txs),
+                "incoming_transaction_count": len(incoming_txs),
+                "total_spent": total_spent,
+                "total_received": total_received,
+                "net_flow": total_received - total_spent,
+                "merchant_diversity_count": len(merchant_spend),
+                "merchant_spending": merchant_spend,
+                "category_spending": category_spend,
+                "savings_rate": round(savings_rate, 4),
+                "credit_profile": profile if not profile.get("error") else None,
+                "milestones": milestones if not milestones.get("error") else None,
+                "profile_error": profile.get("error"),
+                "milestones_error": milestones.get("error"),
+            }
+        except Exception as e:
+            logger.error(f"Failed to compute parent insights for {teen_address}: {e}")
+            return {"error": str(e)}
     
     def create_atomic_purchase_group(
         self,
